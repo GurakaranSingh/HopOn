@@ -42,8 +42,20 @@ namespace HopOn
             });
             services.AddProtectedBrowserStorage();
             #region Services 
-            
 
+            var fileHandlerType = Configuration.GetValue<string>("MySettings:FileHandlerType");
+            switch (fileHandlerType.ToLower())
+            {
+                case "minio":
+                    services.AddScoped<IFileHandler, MinioFileHandler>();
+                    break;
+                case "awssdk":
+                    services.AddScoped<IFileHandler, AWSFileHandler>();
+                    break;
+                case "awsapi":
+                    services.AddScoped<IFileHandler, AWSApiFileHandler>();
+                    break;
+            }
             string mySqlConnectionStr = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContextPool<AppDBContext>(options => options.UseMySql(mySqlConnectionStr, ServerVersion.AutoDetect(mySqlConnectionStr)));
             //services.AddSingleton<IUploadUtilityHelperServices, UploadUtilityHelperServices>();

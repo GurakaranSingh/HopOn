@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace HopOn.Pages
@@ -13,15 +14,17 @@ namespace HopOn.Pages
     {
         public List<ProgressBarList> FileLists { get; set; }
         [Inject]
-        private AppDBContext _appDBContext { get; set; }
+        private AppDBContext DBcontetx { get; set; }
         private async Task<List<ProgressBarList>> GetAllFilesAsync()
         {
             try
             {
+                int count = 0;
                 List<ProgressBarList> Pbfiles = new List<ProgressBarList>();
-                if (await _appDBContext.ProgressBarLists.CountAsync() > 0)
+                count = DBcontetx.ProgressBarLists.Count();
+                if (count > 0)
                 {
-                    Pbfiles = await _appDBContext.ProgressBarLists.ToListAsync();
+                    Pbfiles = await DBcontetx.ProgressBarLists.ToListAsync();
                 }
                 return Pbfiles;
             }
@@ -30,6 +33,11 @@ namespace HopOn.Pages
 
                 throw;
             }
+        }
+
+        public async Task ProgressBarRefresh()
+        {
+            await LoadFiles();
         }
         protected async override Task OnInitializedAsync()
         {

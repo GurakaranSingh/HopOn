@@ -17,77 +17,41 @@ var speedInMbps;
 window.returnArrayAsync = () => {
     DotNet.invokeMethodAsync('HopOn', 'ReturnArrayAsync')
         .then(data => {
-            //start_upload()
-            files = document.getElementById("fileToUpload").files;
-            var filelistcomponnent = document.getElementById('FileListcomponent')
-
-            for (let i = 0; i < files.length; i++) {
-                var Fileobject = { Size: files[i].size }
-                //event.preventDefault();
-                reader = new FileReader();
-                // getting file
-                //Getting AWS UniqueID
-                var xhr = new XMLHttpRequest();
-                xhr.onload = function () {
-                    // Process our return data
-                    if (xhr.status == 200) {
-                        debugger
-                        var result = JSON.parse(xhr.responseText);
-                        var fileModel = { File: files[i], AmazonID: result.uploadId }
-                        Selectedfile.push(fileModel);
-                        localStorage.setItem("awsId", result.uploadId);
-                        var file = Selectedfile
-                        //upload_file(0);
-                        time_start = new Date();
-                        displaySpeed();
-                        var amazonID = "'" + result.uploadId + "'";
-                        //filelistcomponnent.insertAdjacentHTML("afterend",
-                        //    //'<div class="col-md-12" id="divcomponentID_' + files[i].name + '"><h3 class="progress-title">' + files[i].name + ': </h3><div class="progress"><div class="progress-bar" id="progressbarid_' + files[i].name + '" style="width:0%; background:#97c513;"><div class="progress-value" id="progressbarvalue_' + files[i].name + '">0%</div></div></div><button type="button" class="btn btn-outline-success" onclick="upload_file(' + file + ',' + files[i].size + ')">Upload</button></div>');
-                        //    '<div class="col-md-12" id="divcomponentID_' + files[i].name + '"><h3 class="progress-title">' + files[i].name + ': </h3><div class="progress"><div class="progress-bar" id="progressbarid_' + files[i].name + '" style="width:0%; background:#97c513;"><div class="progress-value" id="progressbarvalue_' + files[i].name + '">0%</div></div></div><p><button type="button" class="btn btn-outline-success" onclick="upload_file(' + 0 + ',' + amazonID + ')">Upload</button><span style="margin-left: 136px;" id="UploadTime_' + files[i].name + '"> </span></p></div>');
-                        location.reload();
-                    }
-                };
-
-                var obj = {
-                    fileSize: files[i].size.toString(),
-                    fileName: files[i].name.toString(),
-                }
-                xhr.open("POST", "api/Upload/GetUploadProject", false);
-                xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
-                xhr.send(JSON.stringify(obj));
-
-                var file = "'" + files[i].name + "'";
-
-            }
-            var obj = {
-                FileUploadModel: FileNamearray
-            }
+            start_upload()
+            debugger
+           
         });
 };
 
-function start_upload(name, size) {
-    //event.preventDefault();
-    reader = new FileReader();
-    // getting file
-    //Getting AWS UniqueID
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-        // Process our return data
-        if (xhr.status == 200) {
-            var result = JSON.parse(xhr.responseText);
-            localStorage.setItem("awsId", result.uploadId);
-            var file = Selectedfile
-
-            upload_file(0);
+function start_upload() {
+    files = document.getElementById("fileToUpload").files;
+    for (let i = 0; i < files.length; i++) {
+        reader = new FileReader();
+        // getting file
+        //Getting AWS UniqueID
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+            // Process our return data
+            if (xhr.status == 200) {
+                debugger
+                var result = JSON.parse(xhr.responseText);
+                var fileModel = { File: files[i], AmazonID: result.uploadId }
+                Selectedfile.push(fileModel);
+                localStorage.setItem("awsId", result.uploadId);
+               
+                time_start = new Date();
+                displaySpeed();
+                document.getElementById("ProgressbarRefresh").click();
+            }
+        };
+        var obj = {
+            fileSize: files[i].size.toString(),
+            fileName: files[i].name.toString(),
         }
-    };
-    var obj = {
-        fileSize: size.toString(),
-        fileName: name.toString(),
+        xhr.open("POST", "api/Upload/GetUploadProject", false);
+        xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
+        xhr.send(JSON.stringify(obj));
     }
-    xhr.open("POST", "api/Upload/GetUploadProject");
-    xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
-    xhr.send(JSON.stringify(obj));
 }
 function upload_file(start, amazonunqID) {
     debugger
@@ -110,7 +74,8 @@ function upload_file(start, amazonunqID) {
         xhr.onload = function () {
             if (xhr.status == 200) {
                 var result = JSON.parse(xhr.responseText);
-                var Tags = { PartNumber: result.partNumber, ETag: result.eTag }
+                var Tags = { PartNumber: result["model"].partNumber, ETag: result["model"].eTag }
+                debugger
                 prevetags.push(Tags);
                 end_time = new Date();
                 var size_done = start + slice_size;
@@ -141,7 +106,7 @@ function upload_file(start, amazonunqID) {
                             document.getElementById(Progressvalueid).remove();
                         }, 3000)
 
-                        setTimeout(function () { location.reload() }, 2000)
+                        setTimeout(function () { document.getElementById("FileListRefresh").click(); }, 2000)
                         return;
 
                     };

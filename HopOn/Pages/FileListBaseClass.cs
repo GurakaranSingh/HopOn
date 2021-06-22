@@ -32,6 +32,10 @@ namespace HopOn.Pages
                 throw;
             }
         }
+        public async Task FileListRefresh()
+        {
+            await LoadFiles();
+        }
         protected async override Task OnInitializedAsync()
         {
             await LoadFiles();

@@ -48,6 +48,7 @@ namespace HopOn.Pages
         {
             return Task.FromResult(new int[] { 1, 2, 3 });
         }
+       
         [JSInvokable("startUpload")]
         public static Task<string> startUpload(string filename)
         {
