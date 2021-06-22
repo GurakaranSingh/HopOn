@@ -33,7 +33,7 @@ namespace HopOn.Pages
         }
         protected async override Task OnInitializedAsync()
         {
-            await LoadFiles();
+           // await LoadFiles();
         }
         public async Task LoadFiles()
         {

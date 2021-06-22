@@ -31,20 +31,19 @@ window.returnArrayAsync = () => {
                 xhr.onload = function () {
                     // Process our return data
                     if (xhr.status == 200) {
-                        debugger
                         var result = JSON.parse(xhr.responseText);
+                        debugger
                         var fileModel = { File: files[i], AmazonID: result.uploadId }
                         Selectedfile.push(fileModel);
-                        localStorage.setItem("awsId", result.uploadId);
                         var file = Selectedfile
                         //upload_file(0);
                         time_start = new Date();
                         displaySpeed();
                         var amazonID = "'" + result.uploadId + "'";
-                        //filelistcomponnent.insertAdjacentHTML("afterend",
-                        //    //'<div class="col-md-12" id="divcomponentID_' + files[i].name + '"><h3 class="progress-title">' + files[i].name + ': </h3><div class="progress"><div class="progress-bar" id="progressbarid_' + files[i].name + '" style="width:0%; background:#97c513;"><div class="progress-value" id="progressbarvalue_' + files[i].name + '">0%</div></div></div><button type="button" class="btn btn-outline-success" onclick="upload_file(' + file + ',' + files[i].size + ')">Upload</button></div>');
-                        //    '<div class="col-md-12" id="divcomponentID_' + files[i].name + '"><h3 class="progress-title">' + files[i].name + ': </h3><div class="progress"><div class="progress-bar" id="progressbarid_' + files[i].name + '" style="width:0%; background:#97c513;"><div class="progress-value" id="progressbarvalue_' + files[i].name + '">0%</div></div></div><p><button type="button" class="btn btn-outline-success" onclick="upload_file(' + 0 + ',' + amazonID + ')">Upload</button><span style="margin-left: 136px;" id="UploadTime_' + files[i].name + '"> </span></p></div>');
-                        location.reload();
+                        filelistcomponnent.insertAdjacentHTML("afterend",
+                            //'<div class="col-md-12" id="divcomponentID_' + files[i].name + '"><h3 class="progress-title">' + files[i].name + ': </h3><div class="progress"><div class="progress-bar" id="progressbarid_' + files[i].name + '" style="width:0%; background:#97c513;"><div class="progress-value" id="progressbarvalue_' + files[i].name + '">0%</div></div></div><button type="button" class="btn btn-outline-success" onclick="upload_file(' + file + ',' + files[i].size + ')">Upload</button></div>');
+                            '<div class="col-md-12" id="divcomponentID_' + files[i].name + '"><h3 class="progress-title">' + files[i].name + ': </h3><div class="progress"><div class="progress-bar" id="progressbarid_' + files[i].name + '" style="width:0%; background:#97c513;"><div class="progress-value" id="progressbarvalue_' + files[i].name + '">0%</div></div></div><p><button type="button" class="btn btn-outline-success" onclick="upload_file(' + 0 + ',' + amazonID + ')">Upload</button><span style="margin-left: 136px;" id="UploadTime_' + files[i].name + '"> </span></p></div>');
+                        //location.reload();
                     }
                 };
 
