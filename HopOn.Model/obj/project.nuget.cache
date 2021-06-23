@@ -1,8 +1,14 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "NE46nsnHcPFz8M50Z3pvCIJGdCotOsSsJ4Kw5l4e4Ja7If/cZoIpdpfA7BqVmHdRbUsqCMDvxeKZw8lGzh4qfg==",
   "success": true,
   "projectFilePath": "E:\\HopOn\\GitCopy\\HopOn.Model\\HopOn.Model.csproj",
+=======
+  "dgSpecHash": "0e+xQp3b+YADzFMa2yqXJGBx3G/p58tP1KzA0pG1oLpyaEtTOMzCMQAJ4RtzDLQ77G47tFcIwGKKY33BJ+yC9A==",
+  "success": true,
+  "projectFilePath": "E:\\HopOn\\CLinet Main HopOn\\HopOn.Model\\HopOn.Model.csproj",
+>>>>>>> 952f6d6a5d505c9a7592b96aed86aaba749ac260
   "expectedPackageFiles": [
     "C:\\Users\\gurkaran.singh\\.nuget\\packages\\microsoft.entityframeworkcore\\5.0.7\\microsoft.entityframeworkcore.5.0.7.nupkg.sha512",
     "C:\\Users\\gurkaran.singh\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\5.0.7\\microsoft.entityframeworkcore.abstractions.5.0.7.nupkg.sha512",

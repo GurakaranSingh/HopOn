@@ -1,0 +1,12 @@
+E:\HopOn\CLinet Main HopOn\HopOn.Model\bin\Debug\net5.0\HopOn.Model.deps.json
+E:\HopOn\CLinet Main HopOn\HopOn.Model\bin\Debug\net5.0\HopOn.Model.dll
+E:\HopOn\CLinet Main HopOn\HopOn.Model\bin\Debug\net5.0\ref\HopOn.Model.dll
+E:\HopOn\CLinet Main HopOn\HopOn.Model\bin\Debug\net5.0\HopOn.Model.pdb
+E:\HopOn\CLinet Main HopOn\HopOn.Model\obj\Debug\net5.0\HopOn.Model.csproj.AssemblyReference.cache
+E:\HopOn\CLinet Main HopOn\HopOn.Model\obj\Debug\net5.0\HopOn.Model.GeneratedMSBuildEditorConfig.editorconfig
+E:\HopOn\CLinet Main HopOn\HopOn.Model\obj\Debug\net5.0\HopOn.Model.AssemblyInfoInputs.cache
+E:\HopOn\CLinet Main HopOn\HopOn.Model\obj\Debug\net5.0\HopOn.Model.AssemblyInfo.cs
+E:\HopOn\CLinet Main HopOn\HopOn.Model\obj\Debug\net5.0\HopOn.Model.csproj.CoreCompileInputs.cache
+E:\HopOn\CLinet Main HopOn\HopOn.Model\obj\Debug\net5.0\HopOn.Model.dll
+E:\HopOn\CLinet Main HopOn\HopOn.Model\obj\Debug\net5.0\ref\HopOn.Model.dll
+E:\HopOn\CLinet Main HopOn\HopOn.Model\obj\Debug\net5.0\HopOn.Model.pdb

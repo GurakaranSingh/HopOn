@@ -533,11 +533,19 @@
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
       "projectUniqueName": "E:\\HopOn\\GitCopy\\HopOn.Model\\HopOn.Model.csproj",
       "projectName": "HopOn.Model",
       "projectPath": "E:\\HopOn\\GitCopy\\HopOn.Model\\HopOn.Model.csproj",
       "packagesPath": "C:\\Users\\gurkaran.singh\\.nuget\\packages\\",
       "outputPath": "E:\\HopOn\\GitCopy\\HopOn.Model\\obj\\",
+=======
+      "projectUniqueName": "E:\\HopOn\\CLinet Main HopOn\\HopOn.Model\\HopOn.Model.csproj",
+      "projectName": "HopOn.Model",
+      "projectPath": "E:\\HopOn\\CLinet Main HopOn\\HopOn.Model\\HopOn.Model.csproj",
+      "packagesPath": "C:\\Users\\gurkaran.singh\\.nuget\\packages\\",
+      "outputPath": "E:\\HopOn\\CLinet Main HopOn\\HopOn.Model\\obj\\",
+>>>>>>> 952f6d6a5d505c9a7592b96aed86aaba749ac260
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

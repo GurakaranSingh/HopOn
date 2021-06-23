@@ -1,8 +1,14 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "n78F13ez/Ky9F74Tb4J/2K7p0VoX+B9FpeeECknO3zm4VO+ENHaSKN7AX5Vb3VP+Gcu8NK6gwGVuO32LZrcXow==",
   "success": true,
   "projectFilePath": "E:\\HopOn\\GitCopy\\HOPON.APi\\HOPON.APi.csproj",
+=======
+  "dgSpecHash": "eMp3fll65jOmVHe00ptcBdlYvKKUpinWmXvEvz3M0Z+cTb9gEUKOioXujMw+Gc9XNxUQs1+ErfryXWgk91xzuA==",
+  "success": true,
+  "projectFilePath": "E:\\HopOn\\CLinet Main HopOn\\HOPON.APi\\HOPON.APi.csproj",
+>>>>>>> 952f6d6a5d505c9a7592b96aed86aaba749ac260
   "expectedPackageFiles": [
     "C:\\Users\\gurkaran.singh\\.nuget\\packages\\awssdk.core\\3.7.0.31\\awssdk.core.3.7.0.31.nupkg.sha512",
     "C:\\Users\\gurkaran.singh\\.nuget\\packages\\awssdk.s3\\3.7.1\\awssdk.s3.3.7.1.nupkg.sha512",
