@@ -66,8 +66,15 @@ namespace HopOn.Controller
         [HttpPost("UploadingChunckBytes")]
         public async Task<ActionResult> UploadingChunckBytes(ChunkModel obj)
         {
-            EtagModel model = await _fileHandler.UploadChunks(obj);
-            return new JsonResult(new { model });
+            try
+            {
+                EtagModel model = await _fileHandler.UploadChunks(obj);
+                return new JsonResult(new { model });
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         [HttpPost("GetUploadProject")]
@@ -76,12 +83,29 @@ namespace HopOn.Controller
             string uploadId = await _fileHandler.GetUploadID(obj);
             return new JsonResult(new { uploadId });
         }
-        
+
         [HttpPost("FinalCallFOrCHunk")]
         public async Task<string> FinalCallFOrCHunk(FinalUpload obj)
         {
             string response = await _fileHandler.completed(obj);
             return response;
+        }
+        [HttpPost("CancleUploading")]
+        public async Task<bool> CancleUploading(string AWSID)
+        {
+            bool response = await _fileHandler.CancleUploading(AWSID);
+            return response;
+        }
+        [HttpPost("DeleteAWSFile")]
+        public async Task<bool> DeleteAWSFile(string FileName)
+        {
+            bool response = await _fileHandler.DeleteFileFromAmazon(FileName);
+            return response;
+        }
+        [HttpGet("DownloadAWSFile")]
+        public async Task<FileStreamResult> DownloadAWSFile(string FileName)
+        {
+            return await _fileHandler.DownloadAWSFile(FileName);
         }
     }
 }

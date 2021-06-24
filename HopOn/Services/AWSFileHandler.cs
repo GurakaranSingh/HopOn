@@ -1,8 +1,10 @@
 ﻿using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
+using Amazon.S3.Transfer;
 using HopOn.Model;
 using HopOn.Model.Model;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -101,7 +103,7 @@ namespace HopOn.Services
                     //Step 2: upload each chunk (this is run for every chunk unlike the other steps which are run once)
                     var uploadRequest = new UploadPartRequest
                     {
-                        BucketName = bucketName,
+                        BucketName =bucketName,
                         Key = request.FileName,
                         UploadId = request.awsUniqueId,
                         PartNumber = request.chunkIndex,
@@ -159,7 +161,10 @@ namespace HopOn.Services
                             FileSize = request.FileSize,
                         };
                         bool flag = await _uploadUtilityHelperService.InsertUploadedFileAsync(upload);
-
+                        if (flag)
+                        {
+                            await _ProgressBarListServices.DeleteProgressFileAsync(request.UploadId);
+                        }
                         #endregion
                     }
                     //Set the uploadId and fileURLs with the response.
@@ -172,6 +177,54 @@ namespace HopOn.Services
                 throw;
             }
         }
+        public async Task<bool> CancleUploading(string AWSID)
+        {
+           return await _ProgressBarListServices.DeleteProgressFileAsync(AWSID);
+        }
+        public async Task<bool> DeleteFileFromAmazon(string FileName)
+        {
+            try
+            {
+                bool flag = false;
+                var deleteObjectRequest = new DeleteObjectRequest
+                {
+                    BucketName = bucketName,
+                    Key = FileName
+                };
+                var response = await _s3Client.DeleteObjectAsync(deleteObjectRequest);
+                if (response.HttpStatusCode == HttpStatusCode.NoContent)
+                {
+                    if (await _uploadUtilityHelperService.DeleteUploadedFileAsync(FileName))
+                        flag = true;
+                }
+                return flag;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
+        public async Task<FileStreamResult> DownloadAWSFile(string FileName)
+        {
+            try
+            {
+                string responseBody = "";
+                GetObjectRequest request = new GetObjectRequest
+                {
+                    BucketName = bucketName,
+                    Key = FileName
+                };
+                GetObjectResponse response = await _s3Client.GetObjectAsync(request);
+                return new FileStreamResult(response.ResponseStream, response.Headers.ContentType)
+                { FileDownloadName = FileName };
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
         public void SetAllETags(EtagModel prevETags)
         {
             //var partETags = new List<PartETag>();

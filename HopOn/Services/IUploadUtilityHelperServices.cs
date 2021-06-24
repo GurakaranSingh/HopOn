@@ -12,6 +12,6 @@ namespace HopOn.Services
         Task<bool> InsertUploadedFileAsync(UploadedFile uploadedFile);
         Task<UploadedFile> GetUploadedFileAsync(int Id);
         Task<bool> UpdateUploadedFileAsync(UploadedFile uploadeFile);
-        Task<bool> DeleteUploadedFileAsync(UploadedFile uploadeFile);
+        Task<bool> DeleteUploadedFileAsync(string FileName);
     }
 }

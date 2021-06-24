@@ -13,6 +13,6 @@ namespace HopOn.Services
         Task<bool> InsertProgressFileAsync(ProgressBarList ProgressFile);
         Task<ProgressBarList> GetProgressFileAsync(int Id);
         Task<bool> UpdateProgressFileAsync(ProgressBarList ProgressFile);
-        Task<bool> DeleteProgressFileAsync(ProgressBarList ProgressFile);
+        Task<bool> DeleteProgressFileAsync(string AWSID);
     }
 }

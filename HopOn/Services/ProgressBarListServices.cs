@@ -19,11 +19,23 @@ namespace HopOn.Services
         {
             this._appDBContext = appDBContext;
         }
-
-        public async Task<bool> DeleteProgressFileAsync(ProgressBarList ProgressFile)
+        #endregion
+        public async Task<bool> DeleteProgressFileAsync(string AWSID)
         {
-            _appDBContext.Remove(ProgressFile);
-            await _appDBContext.SaveChangesAsync();
+            try
+            {
+                ProgressBarList RemoveModel = await _appDBContext.ProgressBarLists.Where(PbL => PbL.AwsId == AWSID).FirstOrDefaultAsync();
+                if (RemoveModel != null)
+                {
+                    _appDBContext.Remove(RemoveModel);
+                    await _appDBContext.SaveChangesAsync(); 
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
             return true;
         }
 
@@ -51,7 +63,7 @@ namespace HopOn.Services
 
 
 
-        #endregion
+   
 
 
 

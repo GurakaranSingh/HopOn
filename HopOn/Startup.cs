@@ -46,18 +46,19 @@ namespace HopOn
             var fileHandlerType = Configuration.GetValue<string>("MySettings:FileHandlerType");
             switch (fileHandlerType.ToLower())
             {
-                case "minio":
-                    services.AddScoped<IFileHandler, MinioFileHandler>();
-                    break;
+                //case "minio":
+                //    services.AddScoped<IFileHandler, MinioFileHandler>();
+                //    break;
                 case "awssdk":
                     services.AddScoped<IFileHandler, AWSFileHandler>();
                     break;
-                case "awsapi":
-                    services.AddScoped<IFileHandler, AWSApiFileHandler>();
-                    break;
+                //case "awsapi":
+                //    services.AddScoped<IFileHandler, AWSApiFileHandler>();
+                //    break;
             }
             string mySqlConnectionStr = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContextPool<AppDBContext>(options => options.UseMySql(mySqlConnectionStr, ServerVersion.AutoDetect(mySqlConnectionStr)));
+            services.AddTransient<AppDBContext>();
             //services.AddSingleton<IUploadUtilityHelperServices, UploadUtilityHelperServices>();
             //services.AddHttpClient<IUploadUtilityHelperServices, UploadUtilityHelperServices>(client => client.BaseAddress = new Uri("https://localhost:44306/"));
             services.AddScoped<IUploadUtilityHelperServices, UploadUtilityHelperServices>();
