@@ -1,6 +1,6 @@
 ﻿var reader = {};
 var Selectedfile = [];
-var slice_size = 21457280;
+var slice_size = 73400320;//80 mb
 var chunkIndex = 0;
 //$("#upload").on('click', start_upload);
 var prevetags = [];
@@ -33,6 +33,7 @@ function start_upload() {
         //Getting AWS UniqueID
         var xhr = new XMLHttpRequest();
         xhr.onload = function () {
+             
             // Process our return data
             if (xhr.status == 200) {
                 var result = JSON.parse(xhr.responseText);
@@ -89,8 +90,9 @@ function upload_file(start, amazonunqID) {
                     var UploadTime = 'UploadTime_' + file.File.name
                     document.getElementById(Progressbaraid).style.width = percent_done + '%';
                     document.getElementById(Progressvalueid).innerHTML = percent_done + '%';
+                    if (percent_done == 100) { document.getElementById(Progressvalueid).innerHTML = 'Have patience we are almost done.'; }
                     DataTransfer = DataTransfer + slice_size;
-                    document.getElementById(UploadTime).innerHTML = speedInMbps == undefined || speedInMbps < 0 ? 0 : speedInMbps + " Mbps";//displaySpeed(time_start, end_time, DataTransfer)
+                    //document.getElementById(UploadTime).innerHTML = speedInMbps == undefined || speedInMbps < 0 ? 0 : speedInMbps + " Mbps";//displaySpeed(time_start, end_time, DataTransfer)
                     if (next_slice < file.File.size) {
                         // Update upload progress
                         // More to upload, call function recursively
@@ -125,14 +127,15 @@ function upload_file(start, amazonunqID) {
                     }
                 }
                 else {
-                    NetworkIssue(file.File.name, amazonunqID);
+                     
+                    NetworkIssue(amazonunqID, file.File.name);
                 }
-               
             };
             xhr.onerror = function () {
-                debugger
-                NetworkIssue(file.File.name, amazonunqID);
+                 
+                NetworkIssue(amazonunqID, file.File.name);
             };
+             
             var ChucknData = event.target.result.toString();
             var awsuniqueID = amazonunqID;
             var obj = {
@@ -142,6 +145,7 @@ function upload_file(start, amazonunqID) {
                 chunkIndex: chunkIndex,
                 FileName: file.File.name,
             }
+             
             xhr.open("POST", "api/Upload/UploadingChunckBytes", true);
             xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
             xhr.send(JSON.stringify(obj));
@@ -162,19 +166,20 @@ function SHowHideButtonsOnStart(amazonunqID) {
 function displaySpeed() {
     setInterval(function () {
         if (DataTransfer > 0) {
+            console.log("ENd Time = " + end_time + "  " + " Start Time = " + time_start);
             var timeDuration = (end_time - time_start) / 1000;
-
             var loadedBits = DataTransfer;
 
             /* Converts a number into string
                using toFixed(2) rounding to 2 */
-
             var bps = (loadedBits / timeDuration).toFixed(2);
             var speedInKbps = (bps / 1024).toFixed(2);
             speedInMbps = (speedInKbps / 1024).toFixed(2);
-            if (speedInMbps < 0) {
-                speedInMbps *= -1
-            }
+
+            console.log("bps= " + bps);
+            console.log("loadedBits= " + loadedBits);
+            console.log("timeDuration= " + timeDuration);
+
             //console.log("Your internet connection speed is: \n"
             //    + bps + " bps\n" + speedInKbps
             //    + " kbps\n" + speedInMbps + " Mbps\n");
@@ -191,33 +196,33 @@ function PauseUploading(amazonunqID) {
     document.getElementById("resume_" + amazonunqID).style.display = "inline-block";
 }
 function NetworkIssue(amazonunqID, FileName) {
-    debugger
+     
     IsNetworFail = true;
     document.getElementById("Retry_" + amazonunqID).style.display = "inline-block";
     document.getElementById("UploadTime_" + FileName).style.display = "none";
-    document.getElementById("RetryMessage_" + FileName).innerHTML = "Your Internet Network Fail! Please Try Again";
-    document.getElementById("RetryMessage_" + FileName).style.display = "inline-block";
+    document.getElementById("RetryMessage_" + amazonunqID).innerHTML = "Your Internet Network Fail! Please Try Again";
+    document.getElementById("RetryMessage_" + amazonunqID).style.display = "inline-block";
     document.getElementById("start_" + amazonunqID).style.display = "none";
     document.getElementById("pause_" + amazonunqID).style.display = "none";
     document.getElementById("resume_" + amazonunqID).style.display = "none";
 }
 function ResumeUploading(amazonunqID) {
-    debugger
+     
     IsStopTrue = false
     document.getElementById("pause_" + amazonunqID).style.display = "inline-block";
     document.getElementById("resume_" + amazonunqID).style.display = "none";
     upload_file(next_slice, _amazonunqID);
 }
 function ReTryUploading(amazonunqID) {
-    debugger
     IsNetworFail = false
     document.getElementById("pause_" + amazonunqID).style.display = "inline-block";
     document.getElementById("resume_" + amazonunqID).style.display = "none";
     document.getElementById("Retry_" + amazonunqID).style.display = "none";
+    document.getElementById("RetryMessage_" + amazonunqID).style.display = "none";
     upload_file(next_slice, _amazonunqID);
 }
 function DeleteFile(FileName) {
-    debugger
+     
     //Saving chunk file
     var xhr = new XMLHttpRequest();
     xhr.onload = function () {
@@ -230,7 +235,7 @@ function DeleteFile(FileName) {
     xhr.send();
 }
 function DownloadFile(FileName) {
-    debugger
+     
     //Saving chunk file
     var xhr = new XMLHttpRequest();
     xhr.onload = function () {

@@ -87,7 +87,6 @@ namespace HopOn.Services
             }
             catch (Exception ex)
             {
-
                 throw;
             }
         }
