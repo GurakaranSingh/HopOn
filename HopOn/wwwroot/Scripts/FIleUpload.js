@@ -88,9 +88,11 @@ function upload_file(start, amazonunqID) {
                     var Progressvalueid = 'progressbarvalue_' + file.File.name;
                     if (percent_done > 100) { percent_done = 100; }
                     var UploadTime = 'UploadTime_' + file.File.name
-                    document.getElementById(Progressbaraid).style.width = percent_done + '%';
-                    document.getElementById(Progressvalueid).innerHTML = percent_done + '%';
-                    if (percent_done == 100) { document.getElementById(Progressvalueid).innerHTML = 'Have patience we are almost done.'; }
+                    if (!IsStopTrue) {
+                        document.getElementById(Progressbaraid).style.width = percent_done + '%';
+                        document.getElementById(Progressvalueid).innerHTML = percent_done + '%';
+                    }
+                    if (percent_done == 100) { document.getElementById(Progressvalueid).innerHTML = 'Server is merging chunk please wait!.'; }
                     DataTransfer = DataTransfer + slice_size;
                     //document.getElementById(UploadTime).innerHTML = speedInMbps == undefined || speedInMbps < 0 ? 0 : speedInMbps + " Mbps";//displaySpeed(time_start, end_time, DataTransfer)
                     if (next_slice < file.File.size) {
@@ -145,7 +147,6 @@ function upload_file(start, amazonunqID) {
                 chunkIndex: chunkIndex,
                 FileName: file.File.name,
             }
-             
             xhr.open("POST", "api/Upload/UploadingChunckBytes", true);
             xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
             xhr.send(JSON.stringify(obj));

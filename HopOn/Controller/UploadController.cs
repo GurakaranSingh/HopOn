@@ -18,6 +18,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Minio;
 using Minio.Exceptions;
+using HopOn.Filter;
 
 namespace HopOn.Controller
 {
@@ -65,6 +66,9 @@ namespace HopOn.Controller
 
         [HttpPost("UploadingChunckBytes")]
         //[DisableRequestSizeLimit]
+        [RequestSizeLimit(3147483648)]
+        [RequestFormLimits(MultipartBodyLengthLimit = 3147483648)]
+        [DisableFormValueModelBinding]
         public async Task<ActionResult> UploadingChunckBytes(ChunkModel obj)
         {
             try

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,17 +33,34 @@ namespace HopOn
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(options => options.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.Configure<IISServerOptions>(options =>
+            {
+                options.MaxRequestBodySize = null;// 3147483648;
+            });
+
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.Limits.MaxRequestBodySize = null;// 3147483648; // if don't set default value is: 30 MB
+            });
+
+            services.Configure<FormOptions>(options =>
+            {
+                options.ValueLengthLimit = int.MaxValue;
+                options.MultipartBodyLengthLimit = 3147483648; // if don't set default value is: 128 MB
+                options.MultipartHeadersLengthLimit = int.MaxValue;
+            });
+            //services.AddMvc(options => options.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddControllersWithViews();
-            services.AddHttpClient<IFileUploadServices, FileUploadServices>( client => client.BaseAddress = new Uri("https://localhost:44300/"));
-            services.AddCors(c =>
-            {
-                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());
-            });
+            //services.AddHttpClient<IFileUploadServices, FileUploadServices>( client => client.BaseAddress = new Uri("https://localhost:44300/"));
+            //services.AddCors(c =>
+            //{
+            //    c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());
+            //});
+
             
-            services.AddProtectedBrowserStorage();
+            //services.AddProtectedBrowserStorage();
             #region Services 
 
             var fileHandlerType = Configuration.GetValue<string>("MySettings:FileHandlerType");
