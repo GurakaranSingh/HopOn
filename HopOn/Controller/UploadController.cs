@@ -64,7 +64,7 @@ namespace HopOn.Controller
         }
 
         [HttpPost("UploadingChunckBytes")]
-        [DisableRequestSizeLimit]
+        //[DisableRequestSizeLimit]
         public async Task<ActionResult> UploadingChunckBytes(ChunkModel obj)
         {
             try

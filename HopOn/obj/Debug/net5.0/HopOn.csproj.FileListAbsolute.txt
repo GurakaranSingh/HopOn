@@ -167,4 +167,3 @@ E:\HopOn\GitCopy\HopOn\obj\Debug\net5.0\HopOn.dll
 E:\HopOn\GitCopy\HopOn\obj\Debug\net5.0\ref\HopOn.dll
 E:\HopOn\GitCopy\HopOn\obj\Debug\net5.0\HopOn.pdb
 E:\HopOn\GitCopy\HopOn\obj\Debug\net5.0\HopOn.genruntimeconfig.cache
-E:\HopOn\GitCopy\HopOn\bin\Debug\net5.0\web.config
