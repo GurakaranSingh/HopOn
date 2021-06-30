@@ -2,15 +2,15 @@
 <label for="formFileLg" class="form-label">Large file input example</label>
 <div class="row">
     <div class="col-lg-9">
-        <input multiple class="form-control form-control-lg" id="fileToUpload" type="file" />
+        <input multiple class="form-control form-control-lg" id="fileToUpload" onchange="returnArrayAsync()" type="file" />
     </div>
-    <div class="col-lg-3">
-        @*<button type="button" id="upload" onclick="returnArrayAsync()" class="btn btn-outline-secondary">Upload</button>*@
-        <button class="btn btn-secondary" onclick="returnArrayAsync()">
+    <!--<div class="col-lg-3">-->
+    @*<button type="button" id="upload" onclick="returnArrayAsync()" class="btn btn-outline-secondary">Upload</button>*@
+    <!--<button class="btn btn-secondary" onclick="returnArrayAsync()">
             Upload
         </button>
 
-    </div>
+    </div>-->
     @*<form method="post" asp-controller="Home" asp-action="SaveFileNameLocalStorage">
             <div class="form-group">
                 <div class="col-md-10">

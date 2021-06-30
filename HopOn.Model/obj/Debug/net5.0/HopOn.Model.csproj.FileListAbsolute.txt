@@ -20,3 +20,4 @@ E:\HopOn\GitCopy\HopOn.Model\obj\Debug\net5.0\HopOn.Model.csproj.CoreCompileInpu
 E:\HopOn\GitCopy\HopOn.Model\obj\Debug\net5.0\HopOn.Model.dll
 E:\HopOn\GitCopy\HopOn.Model\obj\Debug\net5.0\ref\HopOn.Model.dll
 E:\HopOn\GitCopy\HopOn.Model\obj\Debug\net5.0\HopOn.Model.pdb
+E:\HopOn\GitCopy\HopOn.Model\obj\Debug\net5.0\HopOn.Model.csproj.AssemblyReference.cache

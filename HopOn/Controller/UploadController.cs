@@ -29,14 +29,16 @@ namespace HopOn.Controller
     {
         #region Declare Variable
         private IFileHandler _fileHandler;
+        private IProgressBarListServices _progressBarListService;
         #endregion
 
 
 
-        public UploadController(IFileHandler fileHandler)
+        public UploadController(IFileHandler fileHandler, IProgressBarListServices progressBarListService)
         {
             #region Resolve Dependancy
             _fileHandler = fileHandler;
+            _progressBarListService = progressBarListService;
             #endregion
         }
 
@@ -111,6 +113,11 @@ namespace HopOn.Controller
         public async Task<FileStreamResult> DownloadAWSFile(string FileName)
         {
             return await _fileHandler.DownloadAWSFile(FileName);
+        }
+        [HttpGet("GetAllProgressFile")]
+        public async Task<List<ProgressBarList>> GetAllProgressFile()
+        {
+            return await _progressBarListService.GetAllFilesAsync();
         }
     }
 }

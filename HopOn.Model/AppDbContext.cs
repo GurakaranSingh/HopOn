@@ -16,5 +16,6 @@ namespace HopOn.Model
      
         public DbSet<UploadedFile> UploadedFiles { get; set; }
         public DbSet<ProgressBarList> ProgressBarLists { get; set; }
+        public DbSet<EtagModel> ETags { get; set; }
     }
 }

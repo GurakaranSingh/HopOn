@@ -83,6 +83,7 @@ namespace HopOn
             //services.AddHttpClient<IUploadUtilityHelperServices, UploadUtilityHelperServices>(client => client.BaseAddress = new Uri("https://localhost:44306/"));
             services.AddScoped<IUploadUtilityHelperServices, UploadUtilityHelperServices>();
             services.AddScoped<IProgressBarListServices, ProgressBarListServices>();
+            
             #endregion
 
             #region Connection String  

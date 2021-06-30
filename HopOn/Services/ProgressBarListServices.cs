@@ -1,6 +1,7 @@
 ﻿using HopOn.Model;
 using HopOn.Model.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace HopOn.Services
             }
             return true;
         }
-
+      
         public async Task<List<ProgressBarList>> GetAllFilesAsync()
         {
             return await _appDBContext.ProgressBarLists.ToListAsync();
@@ -49,24 +50,23 @@ namespace HopOn.Services
             throw new NotImplementedException();
         }
 
-        public async Task<bool> InsertProgressFileAsync(ProgressBarList ProgressFile)
-        {
-            await _appDBContext.ProgressBarLists.AddAsync(ProgressFile);
-            await _appDBContext.SaveChangesAsync();
-            return true;
-        }
-
         public Task<bool> UpdateProgressFileAsync(ProgressBarList ProgressFile)
         {
             throw new NotImplementedException();
         }
 
+       public void InsertProgressFileAsync(ProgressBarList ProgressFile)
+        {
+            try
+            {
+                _appDBContext.ProgressBarLists.Add(ProgressFile);
+                _appDBContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
 
-
-   
-
-
-
-
+                throw;
+            }
+        }
     }
 }

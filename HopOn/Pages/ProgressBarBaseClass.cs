@@ -20,21 +20,19 @@ namespace HopOn.Pages
             try
             {
                 int count = 0;
-                List<ProgressBarList> Pbfiles = new List<ProgressBarList>();
+               // List<ProgressBarList> Pbfiles = new List<ProgressBarList>();
                 count = DBcontetx.ProgressBarLists.Count();
                 if (count > 0)
                 {
-                    Pbfiles = await DBcontetx.ProgressBarLists.ToListAsync();
+                    FileLists = await DBcontetx.ProgressBarLists.ToListAsync();
                 }
-                return Pbfiles;
+                return FileLists;
             }
             catch (System.Exception ex)
             {
-
                 throw;
             }
         }
-
         public async Task ProgressBarRefresh()
         {
             await LoadFiles();

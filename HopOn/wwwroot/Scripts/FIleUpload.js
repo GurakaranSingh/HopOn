@@ -22,8 +22,65 @@ window.returnArrayAsync = () => {
     DotNet.invokeMethodAsync('HopOn', 'ReturnArrayAsync')
         .then(data => {
             start_upload()
+            document.getElementById('fileToUpload').value = null
         });
 };
+function GetProgressList() {
+    debugger
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+        // Process our return data
+        if (xhr.status == 200) {
+            var result = JSON.parse(xhr.responseText);
+            if (Selectedfile.length == 0) {
+                for (var i = 0; i < result.length; i++) {
+                    var Remove = 'Remove_' + result[i]["awsId"];
+                    var start = 'start_' + result[i]["awsId"];
+                    var pause = 'pause_' + result[i]["awsId"];
+                    var resume = 'resume_' + result[i]["awsId"];
+                    var cancel = 'cancel_' + result[i]["awsId"];
+                    var Retry = 'Retry_' + result[i]["awsId"];
+                    document.getElementById(Remove).style.display = "inline-block";
+                    document.getElementById(start).style.display = "none";
+                    document.getElementById(pause).style.display = "none";
+                    document.getElementById(resume).style.display = "none";
+                    document.getElementById(cancel).style.display = "none";
+                    document.getElementById(Retry).style.display = "none";
+                }
+            }
+            else {
+                for (var i = 0; i < result.length; i++) {
+                    var Remove = 'Remove_' + result[i]["awsId"];
+                    var start = 'start_' + result[i]["awsId"];
+                    var pause = 'pause_' + result[i]["awsId"];
+                    var resume = 'resume_' + result[i]["awsId"];
+                    var cancel = 'cancel_' + result[i]["awsId"];
+                    var Retry = 'Retry_' + result[i]["awsId"];
+                    var fileexist = Selectedfile.find(obj => {
+                        return obj.AmazonID === result[i]["awsId"]
+                    });
+                    if (fileexist == null || fileexist == undefined || fileexist == "null") {
+                        document.getElementById(Remove).style.display = "inline-block";
+                        document.getElementById(start).style.display = "none";
+                        document.getElementById(pause).style.display = "none";
+                        document.getElementById(resume).style.display = "none";
+                        document.getElementById(cancel).style.display = "none";
+                        document.getElementById(Retry).style.display = "none";
+                    }
+                }
+            }
+        }
+    };
+    xhr.open("GET", "api/Upload/GetAllProgressFile", false);
+    xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
+    xhr.send();
+}
+
+window.onload = function afterPageLoad() {
+    setTimeout(function () {
+        GetProgressList();
+    }, 100)
+}
 
 function start_upload() {
     files = document.getElementById("fileToUpload").files;
@@ -33,7 +90,7 @@ function start_upload() {
         //Getting AWS UniqueID
         var xhr = new XMLHttpRequest();
         xhr.onload = function () {
-             
+
             // Process our return data
             if (xhr.status == 200) {
                 var result = JSON.parse(xhr.responseText);
@@ -41,10 +98,11 @@ function start_upload() {
                 Selectedfile.push(fileModel);
                 localStorage.setItem("awsId", result.uploadId);
 
-                time_start = new Date();
-                displaySpeed();
-                document.getElementById("ProgressbarRefresh").click();
-
+               // time_start = new Date();
+                //displaySpeed();
+                setTimeout(function () { 
+                    document.getElementById("ProgressbarRefresh").click();
+                }, 1000)
             }
         };
         var obj = {
@@ -56,6 +114,8 @@ function start_upload() {
         xhr.send(JSON.stringify(obj));
     }
 }
+
+
 function upload_file(start, amazonunqID) {
     SHowHideButtonsOnStart(amazonunqID);
     _amazonunqID = amazonunqID;
@@ -84,8 +144,8 @@ function upload_file(start, amazonunqID) {
                     end_time = new Date();
                     var size_done = start + slice_size;
                     var percent_done = Math.floor((size_done / file.File.size) * 100);
-                    var Progressbaraid = 'progressbarid_' + file.File.name;
-                    var Progressvalueid = 'progressbarvalue_' + file.File.name;
+                    var Progressbaraid = 'progressbarid_' + amazonunqID;
+                    var Progressvalueid = 'progressbarvalue_' + amazonunqID;
                     if (percent_done > 100) { percent_done = 100; }
                     var UploadTime = 'UploadTime_' + file.File.name
                     if (!IsStopTrue) {
@@ -103,16 +163,19 @@ function upload_file(start, amazonunqID) {
                     } else {
                         // Update upload progress
                         xhr.onload = function () {
-                            var Progressvalueid = 'progressbarvalue_' + file.File.name;
+                            var Progressvalueid = 'progressbarvalue_' + amazonunqID;
                             document.getElementById(Progressvalueid).innerHTML = 'File Uploaded Succesfully';
-                            end_time = new Date();
-                            document.getElementById(UploadTime).innerHTML = speedInMbps == undefined || speedInMbps < 0 ? 0 : speedInMbps + " Mbps";//displaySpeed(time_start, end_time, DataTransfer)
-                            setTimeout(function () {
-                                var Progressvalueid = 'divcomponentID_' + file.File.name;
+                            //end_time = new Date();
+                           // document.getElementById(UploadTime).innerHTML = speedInMbps == undefined || speedInMbps < 0 ? 0 : speedInMbps + " Mbps";//displaySpeed(time_start, end_time, DataTransfer)
+                                var Progressvalueid = 'divcomponentID_' + amazonunqID;
                                 document.getElementById(Progressvalueid).remove();
-                            }, 1000)
-
-                            setTimeout(function () { document.getElementById("FileListRefresh").click(); }, 1000)
+                            debugger
+                            //setTimeout(function () {
+                            Selectedfile = Selectedfile.filter(function (obj) {
+                                return obj.AmazonID != amazonunqID
+                            })
+                                document.getElementById("FileListRefresh").click();
+                            //}, 1000)
                             return;
                         };
                         var obj = {
@@ -129,15 +192,15 @@ function upload_file(start, amazonunqID) {
                     }
                 }
                 else {
-                     
+
                     NetworkIssue(amazonunqID, file.File.name);
                 }
             };
             xhr.onerror = function () {
-                 
+
                 NetworkIssue(amazonunqID, file.File.name);
             };
-             
+
             var ChucknData = event.target.result.toString();
             var awsuniqueID = amazonunqID;
             var obj = {
@@ -197,7 +260,7 @@ function PauseUploading(amazonunqID) {
     document.getElementById("resume_" + amazonunqID).style.display = "inline-block";
 }
 function NetworkIssue(amazonunqID, FileName) {
-     
+
     IsNetworFail = true;
     document.getElementById("Retry_" + amazonunqID).style.display = "inline-block";
     document.getElementById("UploadTime_" + FileName).style.display = "none";
@@ -208,7 +271,7 @@ function NetworkIssue(amazonunqID, FileName) {
     document.getElementById("resume_" + amazonunqID).style.display = "none";
 }
 function ResumeUploading(amazonunqID) {
-     
+
     IsStopTrue = false
     document.getElementById("pause_" + amazonunqID).style.display = "inline-block";
     document.getElementById("resume_" + amazonunqID).style.display = "none";
@@ -223,7 +286,7 @@ function ReTryUploading(amazonunqID) {
     upload_file(next_slice, _amazonunqID);
 }
 function DeleteFile(FileName) {
-     
+
     //Saving chunk file
     var xhr = new XMLHttpRequest();
     xhr.onload = function () {
@@ -236,7 +299,7 @@ function DeleteFile(FileName) {
     xhr.send();
 }
 function DownloadFile(FileName) {
-     
+
     //Saving chunk file
     var xhr = new XMLHttpRequest();
     xhr.onload = function () {

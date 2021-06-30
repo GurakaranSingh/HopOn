@@ -12,6 +12,7 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HopOn.Services
@@ -77,11 +78,11 @@ namespace HopOn.Services
                         AwsId = uploadId,
                         FileName = request.fileName
                     };
-
-                    if (await _ProgressBarListServices.InsertProgressFileAsync(ProgressList))
-                    {
-                        return uploadId;
-                    }
+                    _ProgressBarListServices.InsertProgressFileAsync(ProgressList);
+                    //Thread background = new Thread(() => InsertProgressBar(ProgressList));
+                    //background.IsBackground = true;
+                    //background.Start();
+                    return uploadId;
                 }
                 return uploadId;
             }
@@ -90,11 +91,14 @@ namespace HopOn.Services
                 throw;
             }
         }
+        private void InsertProgressBar(ProgressBarList ProgressList)
+        {
+            _ProgressBarListServices.InsertProgressFileAsync(ProgressList);
+        }
         public async Task<EtagModel> UploadChunks(ChunkModel request)
         {
             try
             {
-
                 request.chunkData = request.chunkData.Split(',')[1].ToString();
                 var bytes = Convert.FromBase64String(request.chunkData);
                 using (Stream stream = new MemoryStream(bytes))
@@ -137,7 +141,7 @@ namespace HopOn.Services
                     foreach (EtagModel model in request.prevETags)
                     { SetAllETags(model); }
                 }
-                if (request.lastpart)
+                    if (request.lastpart)
                 {
                     var completeRequest = new CompleteMultipartUploadRequest
                     {

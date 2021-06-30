@@ -10,7 +10,7 @@ namespace HopOn.Services
    public interface IProgressBarListServices
     {
         Task<List<ProgressBarList>> GetAllFilesAsync();
-        Task<bool> InsertProgressFileAsync(ProgressBarList ProgressFile);
+        void InsertProgressFileAsync(ProgressBarList ProgressFile);
         Task<ProgressBarList> GetProgressFileAsync(int Id);
         Task<bool> UpdateProgressFileAsync(ProgressBarList ProgressFile);
         Task<bool> DeleteProgressFileAsync(string AWSID);
