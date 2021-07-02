@@ -1,10 +1,10 @@
 ﻿var reader = {};
 var Selectedfile = [];
-var slice_size = 73400320;//80 mb
+var slice_size = 73400320 ;//70 mb
 var chunkIndex = 0;
 //$("#upload").on('click', start_upload);
 var prevetags = [];
-var PartNumber = 0;
+var PartNumber = 0; 
 var FileNamearray = [];
 var DataTransfer = 0;
 var t;
@@ -25,84 +25,27 @@ window.returnArrayAsync = () => {
             document.getElementById('fileToUpload').value = null
         });
 };
-function GetProgressList() {
-    debugger
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-        // Process our return data
-        if (xhr.status == 200) {
-            var result = JSON.parse(xhr.responseText);
-            if (Selectedfile.length == 0) {
-                for (var i = 0; i < result.length; i++) {
-                    var Remove = 'Remove_' + result[i]["awsId"];
-                    var start = 'start_' + result[i]["awsId"];
-                    var pause = 'pause_' + result[i]["awsId"];
-                    var resume = 'resume_' + result[i]["awsId"];
-                    var cancel = 'cancel_' + result[i]["awsId"];
-                    var Retry = 'Retry_' + result[i]["awsId"];
-                    document.getElementById(Remove).style.display = "inline-block";
-                    document.getElementById(start).style.display = "none";
-                    document.getElementById(pause).style.display = "none";
-                    document.getElementById(resume).style.display = "none";
-                    document.getElementById(cancel).style.display = "none";
-                    document.getElementById(Retry).style.display = "none";
-                }
-            }
-            else {
-                for (var i = 0; i < result.length; i++) {
-                    var Remove = 'Remove_' + result[i]["awsId"];
-                    var start = 'start_' + result[i]["awsId"];
-                    var pause = 'pause_' + result[i]["awsId"];
-                    var resume = 'resume_' + result[i]["awsId"];
-                    var cancel = 'cancel_' + result[i]["awsId"];
-                    var Retry = 'Retry_' + result[i]["awsId"];
-                    var fileexist = Selectedfile.find(obj => {
-                        return obj.AmazonID === result[i]["awsId"]
-                    });
-                    if (fileexist == null || fileexist == undefined || fileexist == "null") {
-                        document.getElementById(Remove).style.display = "inline-block";
-                        document.getElementById(start).style.display = "none";
-                        document.getElementById(pause).style.display = "none";
-                        document.getElementById(resume).style.display = "none";
-                        document.getElementById(cancel).style.display = "none";
-                        document.getElementById(Retry).style.display = "none";
-                    }
-                }
-            }
-        }
-    };
-    xhr.open("GET", "api/Upload/GetAllProgressFile", false);
-    xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
-    xhr.send();
-}
-
-window.onload = function afterPageLoad() {
-    setTimeout(function () {
-        GetProgressList();
-    }, 100)
-}
 
 function start_upload() {
     files = document.getElementById("fileToUpload").files;
+    var filelistcomponnent = document.getElementById('FileListcomponent')
     for (let i = 0; i < files.length; i++) {
         reader = new FileReader();
         // getting file
         //Getting AWS UniqueID
         var xhr = new XMLHttpRequest();
         xhr.onload = function () {
-
             // Process our return data
             if (xhr.status == 200) {
                 var result = JSON.parse(xhr.responseText);
                 var fileModel = { File: files[i], AmazonID: result.uploadId }
                 Selectedfile.push(fileModel);
                 localStorage.setItem("awsId", result.uploadId);
-
                // time_start = new Date();
                 //displaySpeed();
-                setTimeout(function () { 
-                    document.getElementById("ProgressbarRefresh").click();
-                }, 1000)
+                var amazonID = "'" + result.uploadId + "'";
+                filelistcomponnent.insertAdjacentHTML("afterend",
+                    '<div class="col-md-12" id="divcomponentID_' + result.uploadId + '"><h3 class= "progress-title">' + files[i].name + ': </h3 ><div class="progress"><div class="progress-bar" id="progressbarid_' + result.uploadId + '" style="width:0%; background:#97c513;"><div class="progress-value" id="progressbarvalue_' + result.uploadId + '">0%</div></div></div><p><button type="button"id="start_' + result.uploadId + '" class="btn btn-success"style="display:inline-block" onclick="upload_file(' + 0 + ',' + amazonID + ')">Start</button> <button type="button"  class="btn btn-warning" style="display:none"id="pause_' + result.uploadId + '" onclick="PauseUploading(' + amazonID + ')">Pause</button> <button type="button" id="resume_' + result.uploadId + '"class="btn btn-primary" style="display:none" onclick="ResumeUploading(' + amazonID + ')">Resume</button> <button type="button" class="btn btn-danger" style="display:none" id="cancel_' + result.uploadId + '" onclick="CancelUploading(' + amazonID + ')">Cancel</button> <button type="button" id="Remove_' + result.uploadId + '"class="btn btn-danger" style="display:none" onclick="CancelUploading(' + amazonID + ')">Remove</button> <button type="button"id="Retry_' + result.uploadId + '"class="btn btn-danger" style="display:none" onclick="ReTryUploading(' + amazonID + ')">Retry</button>   <span style="margin-left: 136px;" id="UploadTime_' + result.uploadId + '"> </span></p></div >');
             }
         };
         var obj = {
@@ -126,6 +69,12 @@ function upload_file(start, amazonunqID) {
 
     var blob = file.File.slice(start, next_slice);
 
+    // var fileBytes = data;
+    // var chunks = filebytes.sli()
+    // for(chunks : chunk){
+    // uploadchunk(chunk, amzongid)
+    //}
+
     reader.onload = function (event) {
         if (event.target.readyState !== FileReader.DONE) {
             return;
@@ -139,15 +88,15 @@ function upload_file(start, amazonunqID) {
             xhr.onload = function () {
                 if (xhr.status == 200) {
                     var result = JSON.parse(xhr.responseText);
-                    var Tags = { PartNumber: result["model"].partNumber, ETag: result["model"].eTag }
-                    prevetags.push(Tags);
+                    //var Tags = { PartNumber: result["model"].partNumber, ETag: result["model"].eTag }
+                    //prevetags.push(Tags);
                     end_time = new Date();
                     var size_done = start + slice_size;
                     var percent_done = Math.floor((size_done / file.File.size) * 100);
                     var Progressbaraid = 'progressbarid_' + amazonunqID;
                     var Progressvalueid = 'progressbarvalue_' + amazonunqID;
                     if (percent_done > 100) { percent_done = 100; }
-                    var UploadTime = 'UploadTime_' + file.File.name
+                    //var UploadTime = 'UploadTime_' + file.File.name
                     if (!IsStopTrue) {
                         document.getElementById(Progressbaraid).style.width = percent_done + '%';
                         document.getElementById(Progressvalueid).innerHTML = percent_done + '%';
@@ -169,7 +118,6 @@ function upload_file(start, amazonunqID) {
                            // document.getElementById(UploadTime).innerHTML = speedInMbps == undefined || speedInMbps < 0 ? 0 : speedInMbps + " Mbps";//displaySpeed(time_start, end_time, DataTransfer)
                                 var Progressvalueid = 'divcomponentID_' + amazonunqID;
                                 document.getElementById(Progressvalueid).remove();
-                            debugger
                             //setTimeout(function () {
                             Selectedfile = Selectedfile.filter(function (obj) {
                                 return obj.AmazonID != amazonunqID
@@ -181,7 +129,7 @@ function upload_file(start, amazonunqID) {
                         var obj = {
                             lastpart: true,
                             UploadId: amazonunqID,
-                            prevETags: prevetags,
+                            prevETags: null,
                             fileName: file.File.name,
                             PartNumber: PartNumber,
                             FileSize: file.File.size.toString()

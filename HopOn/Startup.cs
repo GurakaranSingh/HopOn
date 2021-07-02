@@ -33,21 +33,23 @@ namespace HopOn
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<IISServerOptions>(options =>
-            {
-                options.MaxRequestBodySize = null;// 3147483648;
-            });
+            //    services.Configure<IISServerOptions>(options =>
+            //    {
+            //        options.MaxRequestBodySize = null;// 3147483648;
+            //    });
 
-            services.Configure<KestrelServerOptions>(options =>
-            {
-                options.Limits.MaxRequestBodySize = null;// 3147483648; // if don't set default value is: 30 MB
-            });
-
-            services.Configure<FormOptions>(options =>
-            {
-                options.ValueLengthLimit = int.MaxValue;
-                options.MultipartBodyLengthLimit = 3147483648; // if don't set default value is: 128 MB
-                options.MultipartHeadersLengthLimit = int.MaxValue;
+            //    services.Configure<KestrelServerOptions>(options =>
+            //    {
+            //        options.Limits.MaxRequestBodySize = null;// 3147483648; // if don't set default value is: 30 MB
+            //    });
+            //    services.Configure<FormOptions>(options =>
+            //{
+            //    options.ValueLengthLimit = int.MaxValue;
+            //    options.MultipartBodyLengthLimit = 3147483648; // if don't set default value is: 128 MB
+            //        options.MultipartHeadersLengthLimit = int.MaxValue;
+            //});
+            services.AddSignalR(e => {
+                e.MaximumReceiveMessageSize = 1048576000;
             });
             //services.AddMvc(options => options.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddRazorPages();
@@ -59,7 +61,7 @@ namespace HopOn
             //    c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());
             //});
 
-            
+
             //services.AddProtectedBrowserStorage();
             #region Services 
 
@@ -72,9 +74,9 @@ namespace HopOn
                 case "awssdk":
                     services.AddScoped<IFileHandler, AWSFileHandler>();
                     break;
-                //case "awsapi":
-                //    services.AddScoped<IFileHandler, AWSApiFileHandler>();
-                //    break;
+                    //case "awsapi":
+                    //    services.AddScoped<IFileHandler, AWSApiFileHandler>();
+                    //    break;
             }
             string mySqlConnectionStr = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContextPool<AppDBContext>(options => options.UseMySql(mySqlConnectionStr, ServerVersion.AutoDetect(mySqlConnectionStr)));
@@ -83,7 +85,7 @@ namespace HopOn
             //services.AddHttpClient<IUploadUtilityHelperServices, UploadUtilityHelperServices>(client => client.BaseAddress = new Uri("https://localhost:44306/"));
             services.AddScoped<IUploadUtilityHelperServices, UploadUtilityHelperServices>();
             services.AddScoped<IProgressBarListServices, ProgressBarListServices>();
-            
+
             #endregion
 
             #region Connection String  
@@ -103,6 +105,11 @@ namespace HopOn
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.Use(async (context, next) =>
+            {
+                context.Features.Get<IHttpMaxRequestBodySizeFeature>().MaxRequestBodySize = 1048576000;
+                await next.Invoke();
+            });
             db.Database.EnsureCreated();
             app.UseHttpsRedirection();
             app.UseStaticFiles();

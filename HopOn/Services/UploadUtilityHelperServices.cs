@@ -1,9 +1,14 @@
 ﻿using HopOn.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using MySqlConnector;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace HopOn.Services
 {
@@ -11,12 +16,16 @@ namespace HopOn.Services
     {
         #region Property  
         private readonly AppDBContext _appDBContext;
+        public IConfiguration _configuration { get; }
+        public string _connectionString{get;set;}
         #endregion
 
         #region Constructor  
-        public UploadUtilityHelperServices(AppDBContext appDBContext)
+        public UploadUtilityHelperServices(AppDBContext appDBContext, IConfiguration Configuration)
         {
             this._appDBContext = appDBContext;
+            this._configuration = Configuration;
+            _connectionString = _configuration.GetConnectionString("DefaultConnection");
         }
 
         #endregion
@@ -84,5 +93,63 @@ namespace HopOn.Services
         }
         #endregion
 
+        #region ETag
+        public async Task  InsertEtagModel(EtagModel Etagmodel)
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(_connectionString))
+                {
+                    conn.Open();
+                    string query = "INSERT INTO etags(PartNumber,ETag,AmazonID) VALUES (@PartNumber,@ETag, @AmazonID)";
+                    
+                    using (var command = new MySqlCommand(query, conn))
+                    {
+                        command.Parameters.AddWithValue("@PartNumber",Etagmodel.PartNumber);
+                        command.Parameters.AddWithValue("@ETag", Etagmodel.ETag);
+                        command.Parameters.AddWithValue("@AmazonID", Etagmodel.AmazonID);
+                        command.ExecuteNonQuery();
+                    }
+                    conn.Close();
+                }
+                //using (SqlConnection connection = new SqlConnection(_connectionString))
+                //{
+                //    connection.Open();
+                //    string query = "INSERT INTO etags(PartNumber,ETag,AmazonID) VALUES (@PartNumber,@ETag, @AmazonID)";
+
+                //    using (var command = new SqlCommand(query, connection))
+                //    {
+                //        command.Parameters.AddWithValue("@PartNumber",Etagmodel.PartNumber);
+                //        command.Parameters.AddWithValue("@ETag", Etagmodel.ETag);
+                //        command.Parameters.AddWithValue("@AmazonID", Etagmodel.AmazonID);
+                //        command.ExecuteNonQuery();
+                //    }
+                //}
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+    }
+        public async Task DeleteEtagModel(string AwsID)
+        {
+            try
+            {
+                List<EtagModel> ETagList = await _appDBContext.ETags.Where(s => s.AmazonID == AwsID).ToListAsync();
+                _appDBContext.RemoveRange(ETagList);
+                await _appDBContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
+        public async Task<List<EtagModel>> GetETageByID(string AWSID)
+        {
+            return await _appDBContext.ETags.Where(sp => sp.AmazonID == AWSID).ToListAsync();
+        }
+        #endregion
     }
 }

@@ -67,16 +67,16 @@ namespace HopOn.Controller
         }
 
         [HttpPost("UploadingChunckBytes")]
-        //[DisableRequestSizeLimit]
+        [DisableRequestSizeLimit]
         [RequestSizeLimit(3147483648)]
         [RequestFormLimits(MultipartBodyLengthLimit = 3147483648)]
         [DisableFormValueModelBinding]
-        public async Task<ActionResult> UploadingChunckBytes(ChunkModel obj)
+        public async Task<bool> UploadingChunckBytes(ChunkModel obj)
         {
             try
             {
-                EtagModel model = await _fileHandler.UploadChunks(obj);
-                return new JsonResult(new { model });
+                 await _fileHandler.UploadChunks(obj);
+                return true;
             }
             catch (Exception ex)
             {

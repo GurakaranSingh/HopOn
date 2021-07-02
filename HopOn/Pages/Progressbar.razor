@@ -1,34 +1,4 @@
 ﻿@inherits ProgressBarBaseClass
 
 <div class="row" id="FileListcomponent" >
-    @if (FileLists != null)
-    {
-        @foreach (var File in FileLists)
-        {
-            <div class="col-md-12" id="divcomponentID_@File.AwsId">
-                <h3 class="progress-title">@File.FileName </h3>
-                <div class="progress">
-                    <div class="progress-bar" id="progressbarid_@File.AwsId" style="width:0%; background:#97c513;">
-                        <div class="progress-value" id="progressbarvalue_@File.AwsId">0%</div>
-                    </div>
-                </div>
-                <p>
-                    <button type="button" id="start_@File.AwsId" class="btn btn-success"style="display:inline-block" onclick="upload_file(0 ,'@File.AwsId')">Start</button>
-                    <button type="button" id="pause_@File.AwsId" class="btn btn-warning" style="display:none" onclick="PauseUploading('@File.AwsId')">Pause</button>
-                    <button type="button" id="resume_@File.AwsId" class="btn btn-primary" style="display:none" onclick="ResumeUploading('@File.AwsId')">Resume</button>
-                    <button type="button" id="cancel_@File.AwsId" class="btn btn-danger" style="display:none" onclick="CancelUploading('@File.AwsId')">Cancel</button>
-                    <button type="button" id="Remove_@File.AwsId" class="btn btn-danger" style="display:none" onclick="CancelUploading('@File.AwsId')">Remove</button>
-                    <button type="button" id="Retry_@File.AwsId" class="btn btn-danger" style="display:none" onclick="ReTryUploading('@File.AwsId')">Retry</button>
-                    <span style="margin-left: 136px;" id="UploadTime_@File.FileName"> </span>
-                    <span style="margin-left: 2px; display: inline-block; display:none" id="RetryMessage_@File.AwsId"> </span>
-                </p>
-                @*<button type="button" id="NetworkFailTest" class="btn btn-danger" onclick="NetworkIssue('@File.AwsId', '@File.FileName')">NetworkFail Test</button>*@
-
-            </div>
-        }
-    }
-
-    <button class="btn btn-outline-secondary" id="ProgressbarRefresh" style="display:inline-block" @onclick="ProgressBarRefresh">
-        ProgressBarRefresh
-    </button>
 </div>

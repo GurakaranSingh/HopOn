@@ -35,15 +35,11 @@ namespace HopOn.Pages
         }
         public async Task ProgressBarRefresh()
         {
-            await LoadFiles();
+            await GetAllFilesAsync();
         }
         protected async override Task OnInitializedAsync()
         {
-            await LoadFiles();
-        }
-        public async Task LoadFiles()
-        {
-            FileLists = await GetAllFilesAsync();
+            await GetAllFilesAsync();
         }
     }
 }

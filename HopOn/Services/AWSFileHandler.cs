@@ -23,6 +23,8 @@ namespace HopOn.Services
         private IConfiguration _configurationManager;
         private IProgressBarListServices _ProgressBarListServices;
         private IUploadUtilityHelperServices _uploadUtilityHelperService;
+        private readonly AppDBContext _appDBContext;
+
         public List<PartETag> eTags { get; set; } = new List<PartETag>();
 
 
@@ -31,7 +33,7 @@ namespace HopOn.Services
         private string secretKey = "";
 
         public AWSFileHandler(IUploadUtilityHelperServices uploadUtilityHelperService,
-            IConfiguration configurationManager, IProgressBarListServices ProgressBarListServices)
+            IConfiguration configurationManager, IProgressBarListServices ProgressBarListServices, AppDBContext appDBContext)
         {
             _configurationManager = configurationManager;
             _ProgressBarListServices = ProgressBarListServices;
@@ -49,6 +51,7 @@ namespace HopOn.Services
             };
             this._s3Client = new AmazonS3Client(accessKey, secretKey
             , config);
+            this._appDBContext = appDBContext;
         }
 
         public async Task<string> GetUploadID(GetUploadIdModel request)
@@ -71,19 +74,16 @@ namespace HopOn.Services
                     var initiateMultipartUploadResponse = await _s3Client.InitiateMultipartUploadAsync(initiateRequest);
                     uploadId = initiateMultipartUploadResponse.UploadId;
                 }
-                if (uploadId != "")
-                {
-                    ProgressBarList ProgressList = new ProgressBarList()
-                    {
-                        AwsId = uploadId,
-                        FileName = request.fileName
-                    };
-                    _ProgressBarListServices.InsertProgressFileAsync(ProgressList);
-                    //Thread background = new Thread(() => InsertProgressBar(ProgressList));
-                    //background.IsBackground = true;
-                    //background.Start();
-                    return uploadId;
-                }
+                //if (uploadId != "")
+                //{
+                //    ProgressBarList ProgressList = new ProgressBarList()
+                //    {
+                //        AwsId = uploadId,
+                //        FileName = request.fileName
+                //    };
+                //    _ProgressBarListServices.InsertProgressFileAsync(ProgressList);
+                //    return uploadId;
+                //}
                 return uploadId;
             }
             catch (Exception ex)
@@ -95,53 +95,63 @@ namespace HopOn.Services
         {
             _ProgressBarListServices.InsertProgressFileAsync(ProgressList);
         }
-        public async Task<EtagModel> UploadChunks(ChunkModel request)
+        public async Task UploadChunks(ChunkModel request)
         {
             try
             {
-                request.chunkData = request.chunkData.Split(',')[1].ToString();
-                var bytes = Convert.FromBase64String(request.chunkData);
-                using (Stream stream = new MemoryStream(bytes))
-                {
-                    //Step 2: upload each chunk (this is run for every chunk unlike the other steps which are run once)
-                    var uploadRequest = new UploadPartRequest
-                    {
-                        BucketName =bucketName,
-                        Key = request.FileName,
-                        UploadId = request.awsUniqueId,
-                        PartNumber = request.chunkIndex,
-                        InputStream = stream,
-                        IsLastPart = false,
-                        PartSize = stream.Length
-                    };
-                    var uploadPartResponse = await _s3Client.UploadPartAsync(uploadRequest);
-                    EtagModel ReturnModel = new EtagModel()
-                    {
-                        ETag = uploadPartResponse.ETag,
-                        PartNumber = uploadPartResponse.PartNumber
-                    };
+                int numberofThreads = 10;
 
-                    return ReturnModel;
-                }
+                request.chunkData = request.chunkData.Split(',')[1].ToString();
+                byte[] bytes = Convert.FromBase64String(request.chunkData);
+                Thread Background = new Thread(() => BackTask(request, bytes));
+                Background.IsBackground = true;
+                Background.Start();
             }
             catch (Exception ex)
             {
                 throw;
             }
         }
-
+       public async void BackTask(ChunkModel request, byte[] bytes)
+        {
+            EtagModel ReturnModel;
+            using (Stream stream = new MemoryStream(bytes))
+            {
+                //Step 2: upload each chunk (this is run for every chunk unlike the other steps which are run once)
+                var uploadRequest = new UploadPartRequest
+                {
+                    BucketName = bucketName,
+                    Key = request.FileName,
+                    UploadId = request.awsUniqueId,
+                    PartNumber = request.chunkIndex,
+                    InputStream = stream,
+                    IsLastPart = false,
+                    PartSize = stream.Length
+                };
+                var uploadPartResponse = await _s3Client.UploadPartAsync(uploadRequest);
+                ReturnModel = new EtagModel()
+                {
+                    ETag = uploadPartResponse.ETag,
+                    PartNumber = uploadPartResponse.PartNumber,
+                    AmazonID = request.awsUniqueId
+                };
+            }
+            if (ReturnModel != null)
+                await _uploadUtilityHelperService.InsertEtagModel(ReturnModel).ConfigureAwait(false);
+        }
         public async Task<string> completed(FinalUpload request)
         {
             string response = "";
             List<string> TagIds = new List<string>();
             try
             {
+                request.prevETags = await _uploadUtilityHelperService.GetETageByID(request.UploadId);
                 if (request.prevETags.Count > 0)
                 {
                     foreach (EtagModel model in request.prevETags)
                     { SetAllETags(model); }
                 }
-                    if (request.lastpart)
+                if (request.lastpart)
                 {
                     var completeRequest = new CompleteMultipartUploadRequest
                     {
@@ -166,7 +176,7 @@ namespace HopOn.Services
                         bool flag = await _uploadUtilityHelperService.InsertUploadedFileAsync(upload);
                         if (flag)
                         {
-                            await _ProgressBarListServices.DeleteProgressFileAsync(request.UploadId);
+                            await _uploadUtilityHelperService.DeleteEtagModel(request.UploadId);
                         }
                         #endregion
                     }
@@ -182,7 +192,7 @@ namespace HopOn.Services
         }
         public async Task<bool> CancleUploading(string AWSID)
         {
-           return await _ProgressBarListServices.DeleteProgressFileAsync(AWSID);
+            return await _ProgressBarListServices.DeleteProgressFileAsync(AWSID);
         }
         public async Task<bool> DeleteFileFromAmazon(string FileName)
         {
@@ -219,8 +229,10 @@ namespace HopOn.Services
                     Key = FileName
                 };
                 GetObjectResponse response = await _s3Client.GetObjectAsync(request);
+                response.ResponseStream.Length
                 return new FileStreamResult(response.ResponseStream, response.Headers.ContentType)
-                { FileDownloadName = FileName };
+                { FileDownloadName = FileName,
+                };
             }
             catch (Exception ex)
             {
