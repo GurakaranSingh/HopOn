@@ -15,5 +15,6 @@ namespace HopOn.Services
         Task<FileStreamResult> DownloadAWSFile(string FileName);
         Task<bool> DeleteFileFromAmazon(string FileName);
         Task<bool> CancleUploading(string AWSID);
+        Task<bool> UploadInOneCall(UploadInOneCallModel request);
     }
 }

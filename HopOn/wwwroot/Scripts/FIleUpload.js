@@ -1,10 +1,12 @@
 ﻿var reader = {};
 var Selectedfile = [];
-var slice_size = 73400320 ;//70 mb
+var slice_size = 73400320;//70 mb
+var MimimumSizeForChunk = 73400320//70 mb
+var MaxChunkSerVer = 209715200//200 mb
 var chunkIndex = 0;
 //$("#upload").on('click', start_upload);
 var prevetags = [];
-var PartNumber = 0; 
+var PartNumber = 0;
 var FileNamearray = [];
 var DataTransfer = 0;
 var t;
@@ -28,6 +30,9 @@ window.returnArrayAsync = () => {
 
 function start_upload() {
     files = document.getElementById("fileToUpload").files;
+    var filepath = document.getElementById('fileToUpload').value
+    debugger
+
     var filelistcomponnent = document.getElementById('FileListcomponent')
     for (let i = 0; i < files.length; i++) {
         reader = new FileReader();
@@ -41,7 +46,7 @@ function start_upload() {
                 var fileModel = { File: files[i], AmazonID: result.uploadId }
                 Selectedfile.push(fileModel);
                 localStorage.setItem("awsId", result.uploadId);
-               // time_start = new Date();
+                // time_start = new Date();
                 //displaySpeed();
                 var amazonID = "'" + result.uploadId + "'";
                 filelistcomponnent.insertAdjacentHTML("afterend",
@@ -58,6 +63,45 @@ function start_upload() {
     }
 }
 
+function UploadInOneCall(file, amazonunqID) {
+    debugger
+    var xhr = new XMLHttpRequest();
+    var blob = file.File;
+    reader.onload = function (event) {
+        xhr.onload = function () {
+            if (xhr.status == 200) {
+                var result = JSON.parse(xhr.responseText);
+                var Progressvalueid = 'divcomponentID_' + amazonunqID;
+                document.getElementById(Progressvalueid).remove();
+                //setTimeout(function () {
+                Selectedfile = Selectedfile.filter(function (obj) {
+                    return obj.AmazonID != amazonunqID
+                })
+                document.getElementById("FileListRefresh").click();
+            }
+        };
+        var FileBase64Sting = event.target.result.toString();
+        var obj = {
+            FileName: file.File.name,
+            //FilePath: "C:\\Users\\gurkaran.singh\\Downloads\\UploadUtilityHelper.cs",
+            //awsUniqueId: amazonunqID,
+            ContentType: file.File.type,
+            File: FileBase64Sting,
+            awsUniqueId: amazonunqID
+        }
+        xhr.open("POST", "api/Upload/UploadInOneCall", true);
+        xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
+        xhr.send(JSON.stringify(obj));
+
+        var Progressbaraid = 'progressbarid_' + amazonunqID;
+        var Progressvalueid = 'progressbarvalue_' + amazonunqID;
+        document.getElementById(Progressbaraid).style.width = 100 + '%';
+        document.getElementById(Progressvalueid).innerHTML = 100 + '%';
+        document.getElementById(Progressvalueid).innerHTML = 'Server is merging chunk please wait!.';
+
+    };
+    reader.readAsDataURL(blob);
+}
 
 function upload_file(start, amazonunqID) {
     SHowHideButtonsOnStart(amazonunqID);
@@ -65,10 +109,20 @@ function upload_file(start, amazonunqID) {
     file = Selectedfile.find(obj => {
         return obj.AmazonID === amazonunqID
     });
+    debugger
+    if (file.File.size <= MimimumSizeForChunk) {
+        UploadInOneCall(file, amazonunqID);
+        return;
+    }
+    else if (file.File.size >= MimimumSizeForChunk && file.File.size <= MaxChunkSerVer) {
+        slice_size = 10485760;//10mb
+    }
+    else {
+        slice_size = 73400320;
+    }
     next_slice = start + slice_size + 1;
 
     var blob = file.File.slice(start, next_slice);
-
     // var fileBytes = data;
     // var chunks = filebytes.sli()
     // for(chunks : chunk){
@@ -115,14 +169,14 @@ function upload_file(start, amazonunqID) {
                             var Progressvalueid = 'progressbarvalue_' + amazonunqID;
                             document.getElementById(Progressvalueid).innerHTML = 'File Uploaded Succesfully';
                             //end_time = new Date();
-                           // document.getElementById(UploadTime).innerHTML = speedInMbps == undefined || speedInMbps < 0 ? 0 : speedInMbps + " Mbps";//displaySpeed(time_start, end_time, DataTransfer)
-                                var Progressvalueid = 'divcomponentID_' + amazonunqID;
-                                document.getElementById(Progressvalueid).remove();
+                            // document.getElementById(UploadTime).innerHTML = speedInMbps == undefined || speedInMbps < 0 ? 0 : speedInMbps + " Mbps";//displaySpeed(time_start, end_time, DataTransfer)
+                            var Progressvalueid = 'divcomponentID_' + amazonunqID;
+                            document.getElementById(Progressvalueid).remove();
                             //setTimeout(function () {
                             Selectedfile = Selectedfile.filter(function (obj) {
                                 return obj.AmazonID != amazonunqID
                             })
-                                document.getElementById("FileListRefresh").click();
+                            document.getElementById("FileListRefresh").click();
                             //}, 1000)
                             return;
                         };

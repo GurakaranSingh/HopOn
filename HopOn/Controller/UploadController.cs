@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Minio;
 using Minio.Exceptions;
 using HopOn.Filter;
+using Microsoft.AspNetCore.Hosting;
 
 namespace HopOn.Controller
 {
@@ -30,15 +31,17 @@ namespace HopOn.Controller
         #region Declare Variable
         private IFileHandler _fileHandler;
         private IProgressBarListServices _progressBarListService;
+        private IHostingEnvironment Environment;
         #endregion
 
 
 
-        public UploadController(IFileHandler fileHandler, IProgressBarListServices progressBarListService)
+        public UploadController(IFileHandler fileHandler, IProgressBarListServices progressBarListService, IHostingEnvironment _environment)
         {
             #region Resolve Dependancy
             _fileHandler = fileHandler;
             _progressBarListService = progressBarListService;
+            Environment = _environment;
             #endregion
         }
 
@@ -90,11 +93,38 @@ namespace HopOn.Controller
             string uploadId = await _fileHandler.GetUploadID(obj);
             return new JsonResult(new { uploadId });
         }
-
+        [HttpGet("Test")]
+        public void Test()
+        {
+            string FilePath = System.IO.Path.GetFullPath("testFilePath");
+        }
         [HttpPost("FinalCallFOrCHunk")]
         public async Task<string> FinalCallFOrCHunk(FinalUpload obj)
         {
             string response = await _fileHandler.completed(obj);
+            return response;
+        }
+        [HttpPost("UploadInOneCall")]
+        public async Task<bool> UploadInOneCall(UploadInOneCallModel obj)
+        {
+            //string wwwPath = this.Environment.WebRootPath;
+            //string contentPath = this.Environment.ContentRootPath;
+
+            //string path = Path.Combine(this.Environment.WebRootPath, "Uploads");
+            //if (!Directory.Exists(path))
+            //{
+            //    Directory.CreateDirectory(path);
+            //}
+              
+            //    using (FileStream stream = new FileStream(Path.Combine(path, fileName), FileMode.Create))
+            //    {
+            //        postedFile.CopyTo(stream);
+            //        uploadedFiles.Add(fileName);
+            //        ViewBag.Message += string.Format("<b>{0}</b> uploaded.<br />", fileName);
+            //    }
+            
+
+            bool response = await _fileHandler.UploadInOneCall(obj);
             return response;
         }
         [HttpPost("CancleUploading")]

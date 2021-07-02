@@ -112,7 +112,7 @@ namespace HopOn.Services
                 throw;
             }
         }
-       public async void BackTask(ChunkModel request, byte[] bytes)
+        public async void BackTask(ChunkModel request, byte[] bytes)
         {
             EtagModel ReturnModel;
             using (Stream stream = new MemoryStream(bytes))
@@ -190,6 +190,49 @@ namespace HopOn.Services
                 throw;
             }
         }
+
+
+        public async Task<bool> UploadInOneCall(UploadInOneCallModel request)
+        {
+            bool response = false;
+            try
+            {
+                request.File = request.File.Split(',')[1].ToString();
+                byte[] bytes = Convert.FromBase64String(request.File);
+                using (Stream stream = new MemoryStream(bytes))
+                {
+                    var putRequest = new PutObjectRequest()
+                    {
+                        BucketName = bucketName,
+                        Key = request.FileName,
+                        InputStream = stream,
+                        ContentType = request.ContentType
+                    };
+
+                    PutObjectResponse result = await _s3Client.PutObjectAsync(putRequest);
+
+                    if (result.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        #region SaVeFileMetaData
+                        UploadedFile upload = new UploadedFile
+                        {
+                            AwsId = request.awsUniqueId,
+                            FileName = request.FileName,
+                            FileSize = request.ContentType,
+                        };
+                        bool flag = await _uploadUtilityHelperService.InsertUploadedFileAsync(upload);
+                        response = flag;
+                        #endregion
+                    }
+                }
+                //Set the uploadId and fileURLs with the response.
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
         public async Task<bool> CancleUploading(string AWSID)
         {
             return await _ProgressBarListServices.DeleteProgressFileAsync(AWSID);
@@ -229,9 +272,9 @@ namespace HopOn.Services
                     Key = FileName
                 };
                 GetObjectResponse response = await _s3Client.GetObjectAsync(request);
-                response.ResponseStream.Length
                 return new FileStreamResult(response.ResponseStream, response.Headers.ContentType)
-                { FileDownloadName = FileName,
+                {
+                    FileDownloadName = FileName,
                 };
             }
             catch (Exception ex)
