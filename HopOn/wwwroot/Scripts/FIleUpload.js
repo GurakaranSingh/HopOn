@@ -80,7 +80,8 @@ function start_upload() {
     }
 }
 
-function UploadInOneCall(file, amazonunqID) {
+function UploadInOneCall(file, amazonunqID, Guid) {
+    debugger
     var xhr = new XMLHttpRequest();
     var blob = file.File;
     reader.onload = function (event) {
@@ -103,7 +104,8 @@ function UploadInOneCall(file, amazonunqID) {
             //awsUniqueId: amazonunqID,
             ContentType: file.File.type,
             File: FileBase64Sting,
-            awsUniqueId: amazonunqID
+            awsUniqueId: amazonunqID,
+            Guid: Guid
         }
         xhr.open("POST", "api/Upload/UploadInOneCall", true);
         xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
@@ -127,7 +129,7 @@ function upload_file(start, amazonunqID) {
         return obj.AmazonID === amazonunqID
     });
     if (file.File.size <= MimimumSizeForChunk) {
-        UploadInOneCall(file, amazonunqID);
+        UploadInOneCall(file, amazonunqID, file.Guid);
         return;
     }
     else if (file.File.size >= MimimumSizeForChunk && file.File.size <= MaxChunkSerVer) {

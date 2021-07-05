@@ -74,16 +74,21 @@ namespace HopOn.Services
                     var initiateMultipartUploadResponse = await _s3Client.InitiateMultipartUploadAsync(initiateRequest);
                     uploadId = initiateMultipartUploadResponse.UploadId;
                 }
-                //if (uploadId != "")
-                //{
-                //    ProgressBarList ProgressList = new ProgressBarList()
-                //    {
-                //        AwsId = uploadId,
-                //        FileName = request.fileName
-                //    };
-                //    _ProgressBarListServices.InsertProgressFileAsync(ProgressList);
-                //    return uploadId;
-                //}
+                if (uploadId != "")
+                {
+                    ProgressBarList ProgressList = new ProgressBarList()
+                    {
+                        AwsId = uploadId,
+                        FileName = request.fileName,
+                        Status = FileStatus.Pending,
+                        CreateDate = DateTime.Now,
+                        LastUpdateDate = DateTime.Now,
+                        Guid = ""
+
+                    };
+                    _ProgressBarListServices.InsertProgressFileAsync(ProgressList);
+                    return uploadId;
+                }
                 return uploadId;
             }
             catch (Exception ex)
@@ -95,12 +100,26 @@ namespace HopOn.Services
         {
             _ProgressBarListServices.InsertProgressFileAsync(ProgressList);
         }
+        public async Task<HttpStatusCode> UpdateFileStatus(UpdateFileStatus Status)
+        {
+            try
+            {
+                ProgressBarList UpdateModel = _appDBContext.ProgressBarLists.Where(p => p.AwsId == Status.awsUniqueId).FirstOrDefault();
+                UpdateModel.Status = Status.Status;
+                UpdateModel.LastUpdateDate = DateTime.Now;
+                UpdateModel.Guid = Status.Guid;
+                _appDBContext.SaveChanges();
+                return HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                return HttpStatusCode.BadRequest;
+            }
+        }
         public async Task UploadChunks(ChunkModel request)
         {
             try
             {
-                int numberofThreads = 10;
-
                 request.chunkData = request.chunkData.Split(',')[1].ToString();
                 byte[] bytes = Convert.FromBase64String(request.chunkData);
                 Thread Background = new Thread(() => BackTask(request, bytes));
@@ -114,41 +133,53 @@ namespace HopOn.Services
         }
         public async void BackTask(ChunkModel request, byte[] bytes)
         {
-            EtagModel ReturnModel;
-            using (Stream stream = new MemoryStream(bytes))
+            EtagModel ReturnModel; UpdateFileStatus statusModel;
+            try
             {
-                //Step 2: upload each chunk (this is run for every chunk unlike the other steps which are run once)
-                var uploadRequest = new UploadPartRequest
+                using (Stream stream = new MemoryStream(bytes))
                 {
-                    BucketName = bucketName,
-                    Key = request.Guid,
-                    UploadId = request.awsUniqueId,
-                    PartNumber = request.chunkIndex,
-                    InputStream = stream,
-                    IsLastPart = false,
-                    PartSize = stream.Length
-                };
-                var uploadPartResponse = await _s3Client.UploadPartAsync(uploadRequest);
-                ReturnModel = new EtagModel()
-                {
-                    ETag = uploadPartResponse.ETag,
-                    PartNumber = uploadPartResponse.PartNumber,
-                    AmazonID = request.awsUniqueId
-                };
+                    //Step 2: upload each chunk (this is run for every chunk unlike the other steps which are run once)
+                    var uploadRequest = new UploadPartRequest
+                    {
+                        BucketName = bucketName,
+                        Key = request.Guid,
+                        UploadId = request.awsUniqueId,
+                        PartNumber = request.chunkIndex,
+                        InputStream = stream,
+                        IsLastPart = false,
+                        PartSize = stream.Length
+                    };
+                    var uploadPartResponse = await _s3Client.UploadPartAsync(uploadRequest);
+                    ReturnModel = new EtagModel()
+                    {
+                        ETag = uploadPartResponse.ETag,
+                        PartNumber = uploadPartResponse.PartNumber,
+                        AmazonID = request.awsUniqueId
+                    };
+                }
+                if (ReturnModel != null)
+                    await _uploadUtilityHelperService.InsertEtagModel(ReturnModel).ConfigureAwait(false);
+                statusModel = new UpdateFileStatus() { awsUniqueId = request.awsUniqueId, Status = FileStatus.Inprogress, Guid = request.Guid };
+                await UpdateFileStatus(statusModel);
             }
-            if (ReturnModel != null)
-                await _uploadUtilityHelperService.InsertEtagModel(ReturnModel).ConfigureAwait(false);
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
         public async Task<HttpStatusCode> completed(FinalUpload request)
         {
             List<string> TagIds = new List<string>();
             try
             {
-
+                UpdateFileStatus statusModel;
                 request.prevETags = await _uploadUtilityHelperService.GetETageByID(request.UploadId);
                 if(request.ChucksCount != request.prevETags.Count)
                 {
                     return HttpStatusCode.Conflict;
+                    statusModel = new UpdateFileStatus() { awsUniqueId = request.UploadId, Status = FileStatus.Fail , Guid = request.Guid };
+                    await UpdateFileStatus(statusModel);
                 }
                 else
                 {
@@ -182,10 +213,14 @@ namespace HopOn.Services
                             await _uploadUtilityHelperService.DeleteEtagModel(request.UploadId);
                         }
                         #endregion
+                        statusModel = new UpdateFileStatus() { awsUniqueId = request.UploadId, Status = FileStatus.Succeed, Guid = request.Guid };
+                         await UpdateFileStatus(statusModel);
                         return HttpStatusCode.OK;
                     }
                     else
                     {
+                        statusModel = new UpdateFileStatus() { awsUniqueId = request.UploadId, Status = FileStatus.Fail, Guid = request.Guid };
+                        await UpdateFileStatus(statusModel);
                         return HttpStatusCode.BadRequest;
                     }
                 }
@@ -195,11 +230,9 @@ namespace HopOn.Services
                 throw;
             }
         }
-
-
         public async Task<bool> UploadInOneCall(UploadInOneCallModel request)
         {
-            bool response = false;
+            bool response = false; UpdateFileStatus statusModel;
             try
             {
                 request.File = request.File.Split(',')[1].ToString();
@@ -209,7 +242,7 @@ namespace HopOn.Services
                     var putRequest = new PutObjectRequest()
                     {
                         BucketName = bucketName,
-                        Key = request.FileName,
+                        Key = request.Guid,
                         InputStream = stream,
                         ContentType = request.ContentType
                     };
@@ -224,9 +257,14 @@ namespace HopOn.Services
                             AwsId = request.awsUniqueId,
                             FileName = request.FileName,
                             FileSize = request.ContentType,
+                            Guid = request.Guid
                         };
                         bool flag = await _uploadUtilityHelperService.InsertUploadedFileAsync(upload);
                         response = flag;
+
+
+                        statusModel = new UpdateFileStatus() { awsUniqueId = request.awsUniqueId, Status = FileStatus.Succeed, Guid = request.Guid };
+                        await UpdateFileStatus(statusModel);
                         #endregion
                     }
                 }

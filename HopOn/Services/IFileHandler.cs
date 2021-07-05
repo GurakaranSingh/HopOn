@@ -1,4 +1,5 @@
 ﻿using HopOn.Model;
+using HopOn.Model.Model;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -17,5 +18,7 @@ namespace HopOn.Services
         Task<bool> DeleteFileFromAmazon(string FileName);
         Task<bool> CancleUploading(string AWSID);
         Task<bool> UploadInOneCall(UploadInOneCallModel request);
+        Task<HttpStatusCode> UpdateFileStatus(UpdateFileStatus Status);
+
     }
 }

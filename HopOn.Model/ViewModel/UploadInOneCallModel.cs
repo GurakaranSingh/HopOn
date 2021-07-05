@@ -13,5 +13,6 @@ namespace HopOn.Model
         public string File { get; set; }
         public string awsUniqueId { get; set; }
         public string ContentType { get; set; }
+        public string Guid { get; set; }
     }
 }
