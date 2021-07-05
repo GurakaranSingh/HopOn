@@ -18,7 +18,9 @@ var IsStopTrue = false;
 var IsNetworFail = false;
 var next_slice = 0;
 var _amazonunqID = "";
-
+var Guid = "";
+var FinalChunkSize = 0;
+var ChucksCount = 0;
 
 window.returnArrayAsync = () => {
     DotNet.invokeMethodAsync('HopOn', 'ReturnArrayAsync')
@@ -28,14 +30,29 @@ window.returnArrayAsync = () => {
         });
 };
 
+function generateUUID() { // Public Domain/MIT
+    var d = new Date().getTime();//Timestamp
+    var d2 = (performance && performance.now && (performance.now() * 1000)) || 0;//Time in microseconds since page-load or 0 if unsupported
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16;//random number between 0 and 16
+        if (d > 0) {//Use timestamp until depleted
+            r = (d + r) % 16 | 0;
+            d = Math.floor(d / 16);
+        } else {//Use microseconds since page-load if supported
+            r = (d2 + r) % 16 | 0;
+            d2 = Math.floor(d2 / 16);
+        }
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+}
+
 function start_upload() {
     files = document.getElementById("fileToUpload").files;
     var filepath = document.getElementById('fileToUpload').value
-    debugger
-
     var filelistcomponnent = document.getElementById('FileListcomponent')
     for (let i = 0; i < files.length; i++) {
         reader = new FileReader();
+        Guid = generateUUID() + "." + files[i]["name"].split(".")[1];
         // getting file
         //Getting AWS UniqueID
         var xhr = new XMLHttpRequest();
@@ -43,9 +60,8 @@ function start_upload() {
             // Process our return data
             if (xhr.status == 200) {
                 var result = JSON.parse(xhr.responseText);
-                var fileModel = { File: files[i], AmazonID: result.uploadId }
+                var fileModel = { File: files[i], AmazonID: result.uploadId, Guid: Guid }
                 Selectedfile.push(fileModel);
-                localStorage.setItem("awsId", result.uploadId);
                 // time_start = new Date();
                 //displaySpeed();
                 var amazonID = "'" + result.uploadId + "'";
@@ -56,6 +72,7 @@ function start_upload() {
         var obj = {
             fileSize: files[i].size.toString(),
             fileName: files[i].name.toString(),
+            Guid: Guid,
         }
         xhr.open("POST", "api/Upload/GetUploadProject", false);
         xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
@@ -64,7 +81,6 @@ function start_upload() {
 }
 
 function UploadInOneCall(file, amazonunqID) {
-    debugger
     var xhr = new XMLHttpRequest();
     var blob = file.File;
     reader.onload = function (event) {
@@ -105,11 +121,11 @@ function UploadInOneCall(file, amazonunqID) {
 
 function upload_file(start, amazonunqID) {
     SHowHideButtonsOnStart(amazonunqID);
+    var blob = "";
     _amazonunqID = amazonunqID;
     file = Selectedfile.find(obj => {
         return obj.AmazonID === amazonunqID
     });
-    debugger
     if (file.File.size <= MimimumSizeForChunk) {
         UploadInOneCall(file, amazonunqID);
         return;
@@ -120,15 +136,14 @@ function upload_file(start, amazonunqID) {
     else {
         slice_size = 73400320;
     }
+    ChucksCount = Math.round(file.File.size / slice_size);
+
     next_slice = start + slice_size + 1;
-
-    var blob = file.File.slice(start, next_slice);
-    // var fileBytes = data;
-    // var chunks = filebytes.sli()
-    // for(chunks : chunk){
-    // uploadchunk(chunk, amzongid)
-    //}
-
+    blob = file.File.slice(start, next_slice);
+    if (next_slice > file.File.size) {
+        next_slice = file.File.size;
+        blob = file.File.slice(start);
+    }
     reader.onload = function (event) {
         if (event.target.readyState !== FileReader.DONE) {
             return;
@@ -136,11 +151,10 @@ function upload_file(start, amazonunqID) {
         //Saving chunk file
         if (time_start == null) { time_start = new Date(); }
         var xhr = new XMLHttpRequest();
-
-
         if (!IsStopTrue && !IsNetworFail) {
             xhr.onload = function () {
                 if (xhr.status == 200) {
+                    console.log(ChucksCount);
                     var result = JSON.parse(xhr.responseText);
                     //var Tags = { PartNumber: result["model"].partNumber, ETag: result["model"].eTag }
                     //prevetags.push(Tags);
@@ -163,34 +177,11 @@ function upload_file(start, amazonunqID) {
                         // More to upload, call function recursively
                         chunkIndex = chunkIndex + 1;
                         upload_file(next_slice, amazonunqID);
-                    } else {
+                    }
+                    else {
                         // Update upload progress
-                        xhr.onload = function () {
-                            var Progressvalueid = 'progressbarvalue_' + amazonunqID;
-                            document.getElementById(Progressvalueid).innerHTML = 'File Uploaded Succesfully';
-                            //end_time = new Date();
-                            // document.getElementById(UploadTime).innerHTML = speedInMbps == undefined || speedInMbps < 0 ? 0 : speedInMbps + " Mbps";//displaySpeed(time_start, end_time, DataTransfer)
-                            var Progressvalueid = 'divcomponentID_' + amazonunqID;
-                            document.getElementById(Progressvalueid).remove();
-                            //setTimeout(function () {
-                            Selectedfile = Selectedfile.filter(function (obj) {
-                                return obj.AmazonID != amazonunqID
-                            })
-                            document.getElementById("FileListRefresh").click();
-                            //}, 1000)
-                            return;
-                        };
-                        var obj = {
-                            lastpart: true,
-                            UploadId: amazonunqID,
-                            prevETags: null,
-                            fileName: file.File.name,
-                            PartNumber: PartNumber,
-                            FileSize: file.File.size.toString()
-                        }
-                        xhr.open("POST", "api/Upload/FinalCallFOrCHunk");
-                        xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
-                        xhr.send(JSON.stringify(obj));
+                        //FInal Method call
+                        FinalCallMerging(amazonunqID, file, ChucksCount)
                     }
                 }
                 else {
@@ -211,6 +202,7 @@ function upload_file(start, amazonunqID) {
                 chunkMax: file.File.size,
                 chunkIndex: chunkIndex,
                 FileName: file.File.name,
+                Guid: file.Guid
             }
             xhr.open("POST", "api/Upload/UploadingChunckBytes", true);
             xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
@@ -219,6 +211,55 @@ function upload_file(start, amazonunqID) {
     };
     reader.readAsDataURL(blob);
 }
+
+
+function FinalCallMerging(amazonunqID, file, ChucksCount) {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+        if (xhr.status == 200) {
+            debugger
+            if (xhr.response == "409") {
+                setTimeout(function () {
+                    FinalCallMerging(amazonunqID, file, ChucksCount)
+                }, 2000)
+            }
+            else if (xhr.response == "400") {
+                var Progressvalueid = 'progressbarvalue_' + amazonunqID;
+                document.getElementById(Progressvalueid).innerHTML = 'Something Happen wrong with file';
+                return;
+            }
+            else {
+                var Progressvalueid = 'progressbarvalue_' + amazonunqID;
+                document.getElementById(Progressvalueid).innerHTML = 'File Uploaded Succesfully';
+                //end_time = new Date();
+                // document.getElementById(UploadTime).innerHTML = speedInMbps == undefined || speedInMbps < 0 ? 0 : speedInMbps + " Mbps";//displaySpeed(time_start, end_time, DataTransfer)
+                var Progressvalueid = 'divcomponentID_' + amazonunqID;
+                document.getElementById(Progressvalueid).remove();
+                //setTimeout(function () {
+                Selectedfile = Selectedfile.filter(function (obj) {
+                    return obj.AmazonID != amazonunqID
+                })
+                document.getElementById("FileListRefresh").click();
+                //}, 1000)
+                return;
+            }
+        }
+    };
+    var obj = {
+        lastpart: true,
+        UploadId: amazonunqID,
+        prevETags: null,
+        fileName: file.File.name,
+        PartNumber: PartNumber,
+        FileSize: file.File.size.toString(),
+        Guid: file.Guid,
+        ChucksCount: ChucksCount
+    }
+    xhr.open("POST", "api/Upload/FinalCallFOrCHunk");
+    xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
+    xhr.send(JSON.stringify(obj));
+}
+
 
 function SHowHideButtonsOnStart(amazonunqID) {
     document.getElementById("start_" + amazonunqID).style.display = "none";
@@ -256,7 +297,7 @@ function displaySpeed() {
     }, 1000);
 }
 function PauseUploading(amazonunqID) {
-    console.log("PauseCall");
+    //console.log("PauseCall");
     IsStopTrue = true;
     document.getElementById("pause_" + amazonunqID).style.display = "none";
     document.getElementById("resume_" + amazonunqID).style.display = "inline-block";
@@ -296,19 +337,7 @@ function DeleteFile(FileName) {
             document.getElementById("FileListRefresh").click();
         };
     }
-    xhr.open("POST", "api/Upload/DeleteAWSFile?FileName=" + FileName);
-    xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
-    xhr.send();
-}
-function DownloadFile(FileName) {
-
-    //Saving chunk file
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function () {
-        if (xhr.status == 200) {
-        };
-    }
-    xhr.open("POST", "api/Upload/DownloadAWSFile?FileName=" + FileName);
+    xhr.open("POST", "api/Upload/DeleteAWSFile/" + FileName);
     xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
     xhr.send();
 }

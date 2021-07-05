@@ -9,6 +9,7 @@ namespace HopOn.Model
    public class GetUploadIdModel
     {
         public string fileSize { get; set; }
+        public string Guid { get; set; }
             public string fileName { get; set; }
     }
 }

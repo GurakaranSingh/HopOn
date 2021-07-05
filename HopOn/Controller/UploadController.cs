@@ -45,8 +45,6 @@ namespace HopOn.Controller
             #endregion
         }
 
-
-
         [HttpPost("SaveFileNameLocalStorage")]
         public async Task<ActionResult> SaveFileNameLocalStorage(FileModel obj)
         {
@@ -86,43 +84,21 @@ namespace HopOn.Controller
                 throw;
             }
         }
-
         [HttpPost("GetUploadProject")]
         public async Task<ActionResult> GetUploadProject(GetUploadIdModel obj)
         {
             string uploadId = await _fileHandler.GetUploadID(obj);
             return new JsonResult(new { uploadId });
         }
-        [HttpGet("Test")]
-        public void Test()
-        {
-            string FilePath = System.IO.Path.GetFullPath("testFilePath");
-        }
         [HttpPost("FinalCallFOrCHunk")]
-        public async Task<string> FinalCallFOrCHunk(FinalUpload obj)
+        public async Task<HttpStatusCode> FinalCallFOrCHunk(FinalUpload obj)
         {
-            string response = await _fileHandler.completed(obj);
-            return response;
+            return await _fileHandler.completed(obj);
+           
         }
         [HttpPost("UploadInOneCall")]
         public async Task<bool> UploadInOneCall(UploadInOneCallModel obj)
         {
-            //string wwwPath = this.Environment.WebRootPath;
-            //string contentPath = this.Environment.ContentRootPath;
-
-            //string path = Path.Combine(this.Environment.WebRootPath, "Uploads");
-            //if (!Directory.Exists(path))
-            //{
-            //    Directory.CreateDirectory(path);
-            //}
-              
-            //    using (FileStream stream = new FileStream(Path.Combine(path, fileName), FileMode.Create))
-            //    {
-            //        postedFile.CopyTo(stream);
-            //        uploadedFiles.Add(fileName);
-            //        ViewBag.Message += string.Format("<b>{0}</b> uploaded.<br />", fileName);
-            //    }
-            
 
             bool response = await _fileHandler.UploadInOneCall(obj);
             return response;
@@ -133,17 +109,18 @@ namespace HopOn.Controller
             bool response = await _fileHandler.CancleUploading(AWSID);
             return response;
         }
-        [HttpPost("DeleteAWSFile")]
-        public async Task<bool> DeleteAWSFile(string FileName)
+        [HttpPost("DeleteAWSFile/{id}")]
+        public async Task<bool> DeleteAWSFile(string id)
         {
-            bool response = await _fileHandler.DeleteFileFromAmazon(FileName);
+            bool response = await _fileHandler.DeleteFileFromAmazon(id);
             return response;
         }
-        [HttpGet("DownloadAWSFile")]
-        public async Task<FileStreamResult> DownloadAWSFile(string FileName)
+        [HttpGet("DownloadAWSFile/{id}")]
+        public async Task<FileStreamResult> DownloadAWSFile(string id)
         {
-            return await _fileHandler.DownloadAWSFile(FileName);
+            return await _fileHandler.DownloadAWSFile(id);
         }
+        
         [HttpGet("GetAllProgressFile")]
         public async Task<List<ProgressBarList>> GetAllProgressFile()
         {

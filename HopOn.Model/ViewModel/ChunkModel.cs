@@ -14,5 +14,6 @@ namespace HopOn.Model
         public int nextslice { get; set; }
         public int chunkMax { get; set; }
         public int chunkIndex { get; set; }
+        public string Guid { get; set; }
     }
 }

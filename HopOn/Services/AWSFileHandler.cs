@@ -69,7 +69,7 @@ namespace HopOn.Services
                     var initiateRequest = new InitiateMultipartUploadRequest
                     {
                         BucketName = bucketName,
-                        Key = request.fileName
+                        Key = request.Guid
                     };
                     var initiateMultipartUploadResponse = await _s3Client.InitiateMultipartUploadAsync(initiateRequest);
                     uploadId = initiateMultipartUploadResponse.UploadId;
@@ -121,7 +121,7 @@ namespace HopOn.Services
                 var uploadRequest = new UploadPartRequest
                 {
                     BucketName = bucketName,
-                    Key = request.FileName,
+                    Key = request.Guid,
                     UploadId = request.awsUniqueId,
                     PartNumber = request.chunkIndex,
                     InputStream = stream,
@@ -139,24 +139,26 @@ namespace HopOn.Services
             if (ReturnModel != null)
                 await _uploadUtilityHelperService.InsertEtagModel(ReturnModel).ConfigureAwait(false);
         }
-        public async Task<string> completed(FinalUpload request)
+        public async Task<HttpStatusCode> completed(FinalUpload request)
         {
-            string response = "";
             List<string> TagIds = new List<string>();
             try
             {
+
                 request.prevETags = await _uploadUtilityHelperService.GetETageByID(request.UploadId);
-                if (request.prevETags.Count > 0)
+                if(request.ChucksCount != request.prevETags.Count)
+                {
+                    return HttpStatusCode.Conflict;
+                }
+                else
                 {
                     foreach (EtagModel model in request.prevETags)
                     { SetAllETags(model); }
-                }
-                if (request.lastpart)
-                {
+                    
                     var completeRequest = new CompleteMultipartUploadRequest
                     {
                         BucketName = bucketName,
-                        Key = request.fileName,
+                        Key = request.Guid,
                         UploadId = request.UploadId,
                         PartETags = eTags
                     };
@@ -172,6 +174,7 @@ namespace HopOn.Services
                             FileName = request.fileName,
                             FilePath = "",
                             FileSize = request.FileSize,
+                            Guid = request.Guid,
                         };
                         bool flag = await _uploadUtilityHelperService.InsertUploadedFileAsync(upload);
                         if (flag)
@@ -179,11 +182,13 @@ namespace HopOn.Services
                             await _uploadUtilityHelperService.DeleteEtagModel(request.UploadId);
                         }
                         #endregion
+                        return HttpStatusCode.OK;
                     }
-                    //Set the uploadId and fileURLs with the response.
-                    response = request.UploadId + "|success|" + result.Location + "|";
+                    else
+                    {
+                        return HttpStatusCode.BadRequest;
+                    }
                 }
-                return response;
             }
             catch (Exception ex)
             {
@@ -237,7 +242,7 @@ namespace HopOn.Services
         {
             return await _ProgressBarListServices.DeleteProgressFileAsync(AWSID);
         }
-        public async Task<bool> DeleteFileFromAmazon(string FileName)
+        public async Task<bool> DeleteFileFromAmazon(string Guid)
         {
             try
             {
@@ -245,12 +250,12 @@ namespace HopOn.Services
                 var deleteObjectRequest = new DeleteObjectRequest
                 {
                     BucketName = bucketName,
-                    Key = FileName
+                    Key = Guid
                 };
                 var response = await _s3Client.DeleteObjectAsync(deleteObjectRequest);
                 if (response.HttpStatusCode == HttpStatusCode.NoContent)
                 {
-                    if (await _uploadUtilityHelperService.DeleteUploadedFileAsync(FileName))
+                    if (await _uploadUtilityHelperService.DeleteUploadedFileAsync(Guid))
                         flag = true;
                 }
                 return flag;
@@ -261,20 +266,20 @@ namespace HopOn.Services
                 throw;
             }
         }
-        public async Task<FileStreamResult> DownloadAWSFile(string FileName)
+        public async Task<FileStreamResult> DownloadAWSFile(string Guid)
         {
             try
             {
-                string responseBody = "";
                 GetObjectRequest request = new GetObjectRequest
                 {
                     BucketName = bucketName,
-                    Key = FileName
+                    Key = Guid
                 };
+                string _fileName = _appDBContext.UploadedFiles.Where(sp => sp.Guid == Guid).Select(sp => sp.FileName).FirstOrDefault();
                 GetObjectResponse response = await _s3Client.GetObjectAsync(request);
                 return new FileStreamResult(response.ResponseStream, response.Headers.ContentType)
                 {
-                    FileDownloadName = FileName,
+                    FileDownloadName = _fileName,
                 };
             }
             catch (Exception ex)

@@ -13,8 +13,8 @@
                 <img class="card-img-top imageThumbnail" src="" />
                 <div class="card-footer text-center">
                     <a href="#" class="btn btn-primary m-1">View</a>
-                    <a href="api/Upload/DownloadAWSFile?FileName=@File.FileName" class="btn btn-primary m-1">Download</a>
-                    <a href="javascript:void(0)" class="btn btn-danger m-1" onclick="DeleteFile('@File.FileName')">Delete</a>
+                    <a href="api/Upload/DownloadAWSFile/@File.Guid" class="btn btn-primary m-1">Download</a>
+                    <a href="javascript:void(0)" class="btn btn-danger m-1" onclick="DeleteFile('@File.Guid')">Delete</a>
                 </div>
             </div>
         }

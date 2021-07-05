@@ -15,5 +15,6 @@ namespace HopOn.Model
         public string FilePath { get; set; }
         public string FileSize { get; set; }
         public string AwsId { get; set; }
+        public string Guid { get; set; }
     }
 }

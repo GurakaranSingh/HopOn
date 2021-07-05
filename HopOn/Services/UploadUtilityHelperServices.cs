@@ -41,13 +41,10 @@ namespace HopOn.Services
         #region Insert Uploaded File  
         public async Task<bool> InsertUploadedFileAsync(UploadedFile uploadedFile)
         {
-            UploadedFile CheckExistModel = await _appDBContext.UploadedFiles.Where(up => up.FileName.ToLower() == uploadedFile.FileName.ToLower())?.FirstOrDefaultAsync();
-            if (CheckExistModel == null)
-            {
+            
                 await _appDBContext.UploadedFiles.AddAsync(uploadedFile);
                 await _appDBContext.SaveChangesAsync();
-            }
-            return true;
+                return true;
         }
         #endregion
 
@@ -69,11 +66,11 @@ namespace HopOn.Services
         #endregion
 
         #region DeleteFile
-        public async Task<bool> DeleteUploadedFileAsync(string FileName)
+        public async Task<bool> DeleteUploadedFileAsync(string Guid)
         {
             try
             {
-                UploadedFile RemoveModel = await _appDBContext.UploadedFiles.Where(up => up.FileName.ToLower() == FileName.ToLower()).FirstOrDefaultAsync();
+                UploadedFile RemoveModel = await _appDBContext.UploadedFiles.Where(up => up.Guid == Guid).FirstOrDefaultAsync();
                 if (RemoveModel != null)
                 {
                     _appDBContext.Remove(RemoveModel);
