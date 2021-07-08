@@ -100,16 +100,40 @@ namespace HopOn.Services
         {
             _ProgressBarListServices.InsertProgressFileAsync(ProgressList);
         }
+        public async Task<HttpStatusCode> AbortFileStatus(UpdateFileStatus request)
+        {
+
+            try
+            {
+                var response = await _s3Client.AbortMultipartUploadAsync(new AbortMultipartUploadRequest
+                {
+                    BucketName = bucketName,
+                    Key = request.Guid,
+                    UploadId = request.awsUniqueId
+                });
+                return HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                return HttpStatusCode.BadRequest;
+            }
+        }
+
         public async Task<HttpStatusCode> UpdateFileStatus(UpdateFileStatus Status)
         {
             try
             {
                 ProgressBarList UpdateModel = _appDBContext.ProgressBarLists.Where(p => p.AwsId == Status.awsUniqueId).FirstOrDefault();
-                UpdateModel.Status = Status.Status;
-                UpdateModel.LastUpdateDate = DateTime.Now;
-                UpdateModel.Guid = Status.Guid;
-                _appDBContext.SaveChanges();
-                return HttpStatusCode.OK;
+                if (UpdateModel != null)
+                {
+                    UpdateModel.Status = Status.Status;
+                    UpdateModel.LastUpdateDate = DateTime.Now;
+                    UpdateModel.Guid = Status.Guid;
+                    UpdateModel.ChunkCount = UpdateModel.ChunkCount + 1;
+                    _appDBContext.SaveChanges();
+                    return HttpStatusCode.OK;
+                }
+                return HttpStatusCode.NotFound;
             }
             catch (Exception ex)
             {
@@ -120,6 +144,8 @@ namespace HopOn.Services
         {
             try
             {
+                UpdateFileStatus statusModel = new UpdateFileStatus() { awsUniqueId = request.awsUniqueId, Status = FileStatus.Inprogress, Guid = request.Guid };
+                await UpdateFileStatus(statusModel);
                 request.chunkData = request.chunkData.Split(',')[1].ToString();
                 byte[] bytes = Convert.FromBase64String(request.chunkData);
                 Thread Background = new Thread(() => BackTask(request, bytes));
@@ -133,7 +159,7 @@ namespace HopOn.Services
         }
         public async void BackTask(ChunkModel request, byte[] bytes)
         {
-            EtagModel ReturnModel; UpdateFileStatus statusModel;
+            EtagModel ReturnModel;
             try
             {
                 using (Stream stream = new MemoryStream(bytes))
@@ -159,8 +185,7 @@ namespace HopOn.Services
                 }
                 if (ReturnModel != null)
                     await _uploadUtilityHelperService.InsertEtagModel(ReturnModel).ConfigureAwait(false);
-                statusModel = new UpdateFileStatus() { awsUniqueId = request.awsUniqueId, Status = FileStatus.Inprogress, Guid = request.Guid };
-                await UpdateFileStatus(statusModel);
+               
             }
             catch (Exception ex)
             {
@@ -174,6 +199,7 @@ namespace HopOn.Services
             try
             {
                 UpdateFileStatus statusModel;
+                request.ChucksCount = _appDBContext.ProgressBarLists.Where(p => p.AwsId == request.UploadId).Select(s=>s.ChunkCount).FirstOrDefault();
                 request.prevETags = await _uploadUtilityHelperService.GetETageByID(request.UploadId);
                 if(request.ChucksCount != request.prevETags.Count)
                 {

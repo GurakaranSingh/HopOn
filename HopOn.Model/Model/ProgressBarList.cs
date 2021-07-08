@@ -17,6 +17,7 @@ namespace HopOn.Model.Model
         public  DateTime CreateDate { get; set; }
         public DateTime LastUpdateDate { get; set; }
         public string Guid { get; set; }
+        public int ChunkCount { get; set; }
     }
     public enum FileStatus
     { 

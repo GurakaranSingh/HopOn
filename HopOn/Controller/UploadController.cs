@@ -20,6 +20,9 @@ using Minio;
 using Minio.Exceptions;
 using HopOn.Filter;
 using Microsoft.AspNetCore.Hosting;
+using System.Security.Cryptography;
+using System.Text;
+using HopOn.Model.ViewModel;
 
 namespace HopOn.Controller
 {
@@ -31,17 +34,19 @@ namespace HopOn.Controller
         #region Declare Variable
         private IFileHandler _fileHandler;
         private IProgressBarListServices _progressBarListService;
+        private IUploadUtilityHelperServices _uploadUtilityHelperService;
         private IHostingEnvironment Environment;
         #endregion
 
 
 
-        public UploadController(IFileHandler fileHandler, IProgressBarListServices progressBarListService, IHostingEnvironment _environment)
+        public UploadController(IUploadUtilityHelperServices uploadUtilityHelperService, IFileHandler fileHandler, IProgressBarListServices progressBarListService
+           )
         {
             #region Resolve Dependancy
             _fileHandler = fileHandler;
             _progressBarListService = progressBarListService;
-            Environment = _environment;
+            _uploadUtilityHelperService = uploadUtilityHelperService;
             #endregion
         }
 
@@ -61,22 +66,27 @@ namespace HopOn.Controller
             }
             catch (Exception ex)
             {
-
                 throw;
             }
             return new JsonResult(true);
         }
-
+       
         [HttpPost("UploadingChunckBytes")]
-        [DisableRequestSizeLimit]
-        [RequestSizeLimit(3147483648)]
-        [RequestFormLimits(MultipartBodyLengthLimit = 3147483648)]
-        [DisableFormValueModelBinding]
+        //[HashValidateFilter()]
+        //  [RequestFormLimits(MultipartBodyLengthLimit = 3147483648)]
         public async Task<bool> UploadingChunckBytes(ChunkModel obj)
         {
             try
             {
-                 await _fileHandler.UploadChunks(obj);
+                //var testvar = HttpContext.Request.Query["ClientHashKey"].ToString();
+                //if (await ChechHash(obj.chunkData, obj.ClientHashKey))
+                //{
+                    await _fileHandler.UploadChunks(obj);
+                //}
+                //else
+                //{
+                //    return false;
+                //}
                 return true;
             }
             catch (Exception ex)
@@ -90,11 +100,16 @@ namespace HopOn.Controller
             string uploadId = await _fileHandler.GetUploadID(obj);
             return new JsonResult(new { uploadId });
         }
+        [HttpPost("DeleteMultipleFiles")]
+        public async Task DeleteMultipleFiles(DeleteUpdateModel obj)
+        {
+            await _uploadUtilityHelperService.DeleteListFile(obj);
+        }
         [HttpPost("FinalCallFOrCHunk")]
         public async Task<HttpStatusCode> FinalCallFOrCHunk(FinalUpload obj)
         {
             return await _fileHandler.completed(obj);
-           
+
         }
         [HttpPost("UploadInOneCall")]
         public async Task<bool> UploadInOneCall(UploadInOneCallModel obj)
@@ -120,11 +135,12 @@ namespace HopOn.Controller
         {
             return await _fileHandler.DownloadAWSFile(id);
         }
-        
+
         [HttpGet("GetAllProgressFile")]
         public async Task<List<ProgressBarList>> GetAllProgressFile()
         {
             return await _progressBarListService.GetAllFilesAsync();
         }
+
     }
 }

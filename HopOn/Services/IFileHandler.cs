@@ -19,6 +19,7 @@ namespace HopOn.Services
         Task<bool> CancleUploading(string AWSID);
         Task<bool> UploadInOneCall(UploadInOneCallModel request);
         Task<HttpStatusCode> UpdateFileStatus(UpdateFileStatus Status);
+        Task<HttpStatusCode> AbortFileStatus(UpdateFileStatus request);
 
     }
 }

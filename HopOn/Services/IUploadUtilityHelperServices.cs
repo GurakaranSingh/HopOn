@@ -1,4 +1,5 @@
 ﻿using HopOn.Model;
+using HopOn.Model.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,6 @@ namespace HopOn.Services
         Task InsertEtagModel(EtagModel Etagmodel);
         Task<List<EtagModel>> GetETageByID(string AWSID);
         Task DeleteEtagModel(string AwsID);
+        Task DeleteListFile(DeleteUpdateModel model);
     }
 }

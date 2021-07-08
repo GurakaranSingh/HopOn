@@ -1,4 +1,5 @@
 ﻿using HopOn.Model;
+using HopOn.Model.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MySqlConnector;
@@ -17,7 +18,7 @@ namespace HopOn.Services
         #region Property  
         private readonly AppDBContext _appDBContext;
         public IConfiguration _configuration { get; }
-        public string _connectionString{get;set;}
+        public string _connectionString { get; set; }
         #endregion
 
         #region Constructor  
@@ -41,10 +42,10 @@ namespace HopOn.Services
         #region Insert Uploaded File  
         public async Task<bool> InsertUploadedFileAsync(UploadedFile uploadedFile)
         {
-            
-                await _appDBContext.UploadedFiles.AddAsync(uploadedFile);
-                await _appDBContext.SaveChangesAsync();
-                return true;
+
+            await _appDBContext.UploadedFiles.AddAsync(uploadedFile);
+            await _appDBContext.SaveChangesAsync();
+            return true;
         }
         #endregion
 
@@ -90,8 +91,17 @@ namespace HopOn.Services
         }
         #endregion
 
+        public async Task DeleteListFile(DeleteUpdateModel model)
+        {
+            List<UploadedFile> DeleteModel = await _appDBContext.UploadedFiles.Where(s => model.Ids.Contains(s.Guid)).ToListAsync();
+            if (DeleteModel.Count > 0)
+            {
+                _appDBContext.UploadedFiles.RemoveRange(DeleteModel);
+                await _appDBContext.SaveChangesAsync();
+            }
+        }
         #region ETag
-        public async Task  InsertEtagModel(EtagModel Etagmodel)
+        public async Task InsertEtagModel(EtagModel Etagmodel)
         {
             try
             {
@@ -99,10 +109,10 @@ namespace HopOn.Services
                 {
                     conn.Open();
                     string query = "INSERT INTO etags(PartNumber,ETag,AmazonID) VALUES (@PartNumber,@ETag, @AmazonID)";
-                    
+
                     using (var command = new MySqlCommand(query, conn))
                     {
-                        command.Parameters.AddWithValue("@PartNumber",Etagmodel.PartNumber);
+                        command.Parameters.AddWithValue("@PartNumber", Etagmodel.PartNumber);
                         command.Parameters.AddWithValue("@ETag", Etagmodel.ETag);
                         command.Parameters.AddWithValue("@AmazonID", Etagmodel.AmazonID);
                         command.ExecuteNonQuery();
@@ -128,7 +138,7 @@ namespace HopOn.Services
 
                 throw;
             }
-    }
+        }
         public async Task DeleteEtagModel(string AwsID)
         {
             try

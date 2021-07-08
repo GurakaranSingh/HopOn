@@ -14,5 +14,7 @@ namespace HopOn.Services
         Task<ProgressBarList> GetProgressFileAsync(int Id);
         Task<bool> UpdateProgressFileAsync(ProgressBarList ProgressFile);
         Task<bool> DeleteProgressFileAsync(string AWSID);
+        Task<List<ProgressBarList>> GetListAsync(FileStatus status, DateTime Date);
+        Task DeleteEtags(string Awsid);
     }
 }

@@ -39,7 +39,16 @@ namespace HopOn.Services
             }
             return true;
         }
-      
+        public async Task<List<ProgressBarList>> GetListAsync(FileStatus status , DateTime Date)
+        {
+            return await _appDBContext.ProgressBarLists.Where(s => s.Status == status).Distinct().ToListAsync();
+        }
+        public async Task DeleteEtags(string Awsid)
+        {
+            List<EtagModel> DeleteModel = await _appDBContext.ETags.Where(s => s.AmazonID == Awsid).ToListAsync();
+            _appDBContext.RemoveRange(DeleteModel);
+            _appDBContext.SaveChanges();
+        }
         public async Task<List<ProgressBarList>> GetAllFilesAsync()
         {
             return await _appDBContext.ProgressBarLists.ToListAsync();
@@ -64,7 +73,6 @@ namespace HopOn.Services
             }
             catch (Exception ex)
             {
-
                 throw;
             }
         }

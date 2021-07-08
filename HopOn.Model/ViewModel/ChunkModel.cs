@@ -15,5 +15,6 @@ namespace HopOn.Model
         public int chunkMax { get; set; }
         public int chunkIndex { get; set; }
         public string Guid { get; set; }
+        public string ClientHashKey { get; set; }
     }
 }
