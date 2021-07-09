@@ -7,19 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controller\ValuesController.cs" />
     <Compile Remove="Pages\Counter.razor.cs" />
     <Compile Remove="Pages\FileList.razor.cs" />
     <Compile Remove="Pages\Progressbar.razor.cs" />
     <Compile Remove="Services\AWSApiFileHandler.cs" />
     <Compile Remove="Services\MinioFileHandler.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="web.config" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="wwwroot\Images\Photo.jpg" />
   </ItemGroup>
 
   <ItemGroup>

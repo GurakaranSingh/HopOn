@@ -1,6 +1,5 @@
 ﻿class SHA256Hash {
     SHA256(s) {
-        debugger
         var chrsz = 8;
         var hexcase = 0;
         function safe_add(x, y) {

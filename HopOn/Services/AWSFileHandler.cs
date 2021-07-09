@@ -182,9 +182,10 @@ namespace HopOn.Services
                         PartNumber = uploadPartResponse.PartNumber,
                         AmazonID = request.awsUniqueId
                     };
+                    if (ReturnModel != null)
+                        await _uploadUtilityHelperService.InsertEtagModel(ReturnModel).ConfigureAwait(false);
                 }
-                if (ReturnModel != null)
-                    await _uploadUtilityHelperService.InsertEtagModel(ReturnModel).ConfigureAwait(false);
+               
                
             }
             catch (Exception ex)
@@ -201,7 +202,7 @@ namespace HopOn.Services
                 UpdateFileStatus statusModel;
                 request.ChucksCount = _appDBContext.ProgressBarLists.Where(p => p.AwsId == request.UploadId).Select(s=>s.ChunkCount).FirstOrDefault();
                 request.prevETags = await _uploadUtilityHelperService.GetETageByID(request.UploadId);
-                if(request.ChucksCount != request.prevETags.Count)
+               if(request.ChucksCount != request.prevETags.Count)
                 {
                     return HttpStatusCode.Conflict;
                     statusModel = new UpdateFileStatus() { awsUniqueId = request.UploadId, Status = FileStatus.Fail , Guid = request.Guid };
@@ -229,7 +230,7 @@ namespace HopOn.Services
                         {
                             AwsId = request.UploadId,
                             FileName = request.fileName,
-                            FilePath = "",
+                            FilePath = "Images/" + GetFileName(request.fileName.Split(".")[1].ToLower()),
                             FileSize = request.FileSize,
                             Guid = request.Guid,
                         };
@@ -283,7 +284,8 @@ namespace HopOn.Services
                             AwsId = request.awsUniqueId,
                             FileName = request.FileName,
                             FileSize = request.ContentType,
-                            Guid = request.Guid
+                            Guid = request.Guid,
+                            FilePath = "Images/"+ GetFileName(request.FileName.Split(".")[1].ToLower())
                         };
                         bool flag = await _uploadUtilityHelperService.InsertUploadedFileAsync(upload);
                         response = flag;
@@ -300,6 +302,23 @@ namespace HopOn.Services
             catch (Exception ex)
             {
                 throw;
+            }
+        }
+        private string GetFileName(string ext)
+        {
+            switch(ext)
+            {
+                case "jpg":
+                case "jpeg":
+                    return "image.png";
+                case "zip":
+                    return "Zip.jpg";
+                case "mp4":
+                    return "mp4.png";
+                case "pdf.png":
+                    return "pdf.png";
+                default:
+                    return "Default.png";
             }
         }
         public async Task<bool> CancleUploading(string AWSID)
@@ -330,6 +349,7 @@ namespace HopOn.Services
                 throw;
             }
         }
+        
         public async Task<FileStreamResult> DownloadAWSFile(string Guid)
         {
             try

@@ -10,4 +10,5 @@ namespace HopOn.Model.ViewModel
     {
         public List<string> Ids { get; set; }
     }
+    
 }

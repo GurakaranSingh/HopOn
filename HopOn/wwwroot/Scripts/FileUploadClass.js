@@ -1,6 +1,6 @@
 ﻿//var reader = {};
 var Selectedfile = [];
-var slice_size = 31457280;//30mb//73400320;//70 mb
+var slice_size = 73400320;//70 mb 31457280;//30mb//
 var MimimumSizeForChunk = 73400320//70 mb
 var MaxChunkSerVer = 209715200//200 mb
 var chunkIndex = 0;
@@ -22,6 +22,7 @@ var Guid = "";
 var FinalChunkSize = 0;
 var ChucksCount = 0;
 var MultiFileSelectArray = [];
+var MultiFileSelectArrayFileName = [];
 
 class FileUpload {
 
@@ -42,13 +43,13 @@ class FileUpload {
             // Process our return data
             if (xhr.status == 200) {
                 var result = JSON.parse(xhr.responseText);
-                var fileModel = { File: files, AmazonID: result.uploadId, Guid: Guid }
+                var fileModel = { File: files, AmazonID: result.uploadId, Guid: Guid, index: index }
                 Selectedfile.push(fileModel);
                 // time_start = new Date();
                 //displaySpeed();
                 var amazonID = "'" + result.uploadId + "'";
                 filelistcomponnent.insertAdjacentHTML("afterend",
-                    '<div class="col-md-12" id="divcomponentID_' + result.uploadId + '"><h3 class= "progress-title">' + files.name + ': </h3 ><div class="progress"><div class="progress-bar" id="progressbarid_' + result.uploadId + '" style="width:0%; background:#97c513;"><div class="progress-value" id="progressbarvalue_' + result.uploadId + '">0%</div></div></div><p><button type="button"id="start_' + result.uploadId + '" class="btn btn-success"style="display:inline-block" onclick="upload_file(' + 0 + ',' + amazonID + ',' + index + ')">Start</button> <button type="button"  class="btn btn-warning" style="display:none"id="pause_' + result.uploadId + '" onclick="PauseUploading(' + amazonID + ')">Pause</button> <button type="button" id="resume_' + result.uploadId + '"class="btn btn-primary" style="display:none" onclick="ResumeUploading(' + amazonID + ')">Resume</button> <button type="button" class="btn btn-danger" style="display:none" id="cancel_' + result.uploadId + '" onclick="CancelUploading(' + amazonID + ')">Cancel</button> <button type="button" id="Remove_' + result.uploadId + '"class="btn btn-danger" style="display:none" onclick="CancelUploading(' + amazonID + ')">Remove</button> <button type="button"id="Retry_' + result.uploadId + '"class="btn btn-danger" style="display:none" onclick="ReTryUploading(' + amazonID + ')">Retry</button>   <span style="margin-left: 136px;" id="UploadTime_' + result.uploadId + '"> </span></p></div >');
+                    '<div class="col-md-12" id="divcomponentID_' + result.uploadId + '"><h3 class= "progress-title">' + files.name + ': </h3 ><div class="progress"><div class= "progress-bar" id="progressbarid_' + result.uploadId + index + '" style = "width:0%; background:#97c513;" ><div class="progress-value" id="progressbarvalue_' + result.uploadId + index + '">0%</div></div></div><p><button type="button" id="start_' + result.uploadId + '"class="btn btn-success" style="display:inline-block" onclick="upload_file(' + 0 + ',' + amazonID + ',' + index + ')">Start</button><button type="button" class= "btn btn-warning" style="display:none" id="pause_' + result.uploadId + '"onclick = "PauseUploading(' + amazonID + ')"> Pause</button><button type="button" id="resume_' + result.uploadId + '" class="btn btn-primary" style="display:none" onclick="ResumeUploading(' + amazonID + ')">Resume</button><button type="button" class="btn btn-danger" style="display:none" id="cancel_' + result.uploadId + '" onclick="CancelUploading(' + amazonID + ')">Cancel</button><button type="button" id="Remove_' + result.uploadId + '"class="btn btn-danger" style="display:none" onclick="CancelUploading(' + amazonID + ')">Remove</button><button type="button" id="Retry_' + result.uploadId + '" class="btn btn-danger" style="display:none" onclick="ReTryUploading(' + amazonID + ')">Retry</button><span style="margin-left: 136px;" id="UploadTime_' + result.uploadId + '"></span></p></div>');
             }
         };
         var obj = {
@@ -76,7 +77,7 @@ class FileUpload {
             return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
         });
     }
-    UploadInOneCall(file, amazonunqID, Guid) {
+    UploadInOneCall(file, amazonunqID, Guid, index) {
         var reader = {};
         reader = new FileReader();
         var xhr = new XMLHttpRequest();
@@ -108,8 +109,8 @@ class FileUpload {
             xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
             xhr.send(JSON.stringify(obj));
 
-            var Progressbaraid = 'progressbarid_' + amazonunqID;
-            var Progressvalueid = 'progressbarvalue_' + amazonunqID;
+            var Progressbaraid = 'progressbarid_' + amazonunqID + index;
+            var Progressvalueid = 'progressbarvalue_' + amazonunqID + index;
             document.getElementById(Progressbaraid).style.width = 100 + '%';
             document.getElementById(Progressvalueid).innerHTML = 100 + '%';
             document.getElementById(Progressvalueid).innerHTML = 'Server is merging chunk please wait!.';
@@ -118,10 +119,9 @@ class FileUpload {
         reader.readAsDataURL(blob);
     }
 
-    upload_file(start, amazonunqID) {
+    upload_file(start, amazonunqID, index) {
         var reader = {};
         reader = new FileReader();
-
         new FileUpload().SHowHideButtonsOnStart(amazonunqID);
         let blob = "";
 
@@ -130,7 +130,7 @@ class FileUpload {
             return obj.AmazonID === amazonunqID
         });
         if (file.File.size <= MimimumSizeForChunk) {
-            new FileUpload().UploadInOneCall(file, amazonunqID, file.Guid);
+            new FileUpload().UploadInOneCall(file, amazonunqID, file.Guid, index);
             return;
         }
         else if (file.File.size >= MimimumSizeForChunk && file.File.size <= MaxChunkSerVer) {
@@ -148,6 +148,7 @@ class FileUpload {
             next_slice = file.File.size;
             blob = file.File.slice(start);
         }
+        
         reader.onload = function (event) {
             if (event.target.readyState !== FileReader.DONE) {
                 return;
@@ -165,11 +166,14 @@ class FileUpload {
                         end_time = new Date();
                         var size_done = start + slice_size;
                         var percent_done = Math.floor((size_done / file.File.size) * 100);
-                        var Progressbaraid = 'progressbarid_' + amazonunqID;
-                        var Progressvalueid = 'progressbarvalue_' + amazonunqID;
+                        debugger
+                       
+                        var Progressbaraid = 'progressbarid_' + amazonunqID + index;
+                        var Progressvalueid = 'progressbarvalue_' + amazonunqID + index;;
                         if (percent_done > 100) { percent_done = 100; }
                         //var UploadTime = 'UploadTime_' + file.File.name
                         if (!IsStopTrue) {
+                            debugger
                             document.getElementById(Progressbaraid).style.width = percent_done + '%';
                             document.getElementById(Progressvalueid).innerHTML = percent_done + '%';
                         }
@@ -180,7 +184,7 @@ class FileUpload {
                             // Update upload progress
                             // More to upload, call function recursively
                             chunkIndex = chunkIndex + 1;
-                            new FileUpload().upload_file(next_slice, amazonunqID);
+                            new FileUpload().upload_file(next_slice, amazonunqID, index);
                         }
                         else {
                             // Update upload progress
@@ -218,16 +222,25 @@ class FileUpload {
         };
         reader.readAsDataURL(blob);
     }
-    checkValue(AwsId,guid) {
+    checkValue(AwsId, guid, FileName) {
         document.getElementById(AwsId).addEventListener("change", function () {
             var cb = this;
             //console.log(cb["checked"],guid);
             if (cb["checked"] == true) {
+                var isExist = MultiFileSelectArray.find(obj => {
+                    return obj === guid
+                });
+                if (isExist != null) { return; }
                 MultiFileSelectArray.push(guid);
+                var FileObject = { FileName: FileName, Guid: guid };
+                MultiFileSelectArrayFileName.push(FileObject);
             }
             else {
                 MultiFileSelectArray = MultiFileSelectArray.filter(function (obj) {
                     return obj != guid
+                })
+                MultiFileSelectArrayFileName = MultiFileSelectArrayFileName.filter(function (obj) {
+                    return obj.Guid != guid
                 })
             }
 
@@ -243,7 +256,7 @@ class FileUpload {
     }
 
     DownloadDeleteMultiPel(Flag) {
-        debugger
+
         if (MultiFileSelectArray.length > 0) {
             if (Flag == "Download") {
                 for (var i = 0; i < MultiFileSelectArray.length; i++) {
@@ -251,14 +264,13 @@ class FileUpload {
                     if (MultiFileSelectArray[i] != "undefined" && MultiFileSelectArray[i] != undefined)
                         // window.location = window.location.href + "api/Upload/DownloadAWSFile/" + MultiFileSelectArray[i];
                         var FileId = MultiFileSelectArray[i];
-                   
+
                     var url = window.location.href + "api/Upload/DownloadAWSFile/" + FileId
                     window.open(url, '_blank');
                     //document.getElementById(FileId).click();
                 }
             }
             else if (Flag == "Delete") {
-                debugger
                 var xhr = new XMLHttpRequest();
                 xhr.onload = function () {
                     if (xhr.status == 200) {
@@ -389,7 +401,7 @@ class FileUpload {
         document.getElementById("resume_" + amazonunqID).style.display = "none";
         upload_file(next_slice, _amazonunqID);
     }
-    
+
     ReTryUploading(amazonunqID) {
         IsNetworFail = false
         document.getElementById("pause_" + amazonunqID).style.display = "inline-block";
@@ -413,7 +425,7 @@ class FileUpload {
     }
 
     CancelUploading(awsid) {
-        
+
         setTimeout(function () {
             var xhr = new XMLHttpRequest();
             xhr.onload = function () {

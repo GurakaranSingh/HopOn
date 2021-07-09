@@ -14,10 +14,14 @@ namespace HopOn.Filter
     {
         public string _chunkData { get; set; }
         public string _clientHashKey{ get; set; }
-        public HashValidateFilter(string chuckData, string ClientHashKey)
+        //public HashValidateFilter(string chuckData, string ClientHashKey)
+        //{
+        //    _chunkData = chuckData;
+        //    _clientHashKey = ClientHashKey;
+        //}
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
-            _chunkData = chuckData;
-            _clientHashKey = ClientHashKey;
+            CheckHash();
         }
         public async Task<bool> CheckHash()
         {

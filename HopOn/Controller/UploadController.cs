@@ -70,23 +70,43 @@ namespace HopOn.Controller
             }
             return new JsonResult(true);
         }
-       
+        private async Task<bool> CheckHash(string chunkData, string ClientHashKey)
+        {
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                bool flag = false;
+                // ComputeHash - returns byte array  
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(chunkData));
+
+                // Convert byte array to a string   
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                string ServerHashKey = builder.ToString();
+                if (ClientHashKey == ServerHashKey)
+                {
+                    flag = true;
+                }
+                return flag;
+            }
+        }
         [HttpPost("UploadingChunckBytes")]
-        //[HashValidateFilter()]
-        //  [RequestFormLimits(MultipartBodyLengthLimit = 3147483648)]
+        [HashValidateFilter]
         public async Task<bool> UploadingChunckBytes(ChunkModel obj)
         {
             try
             {
-                //var testvar = HttpContext.Request.Query["ClientHashKey"].ToString();
-                //if (await ChechHash(obj.chunkData, obj.ClientHashKey))
+                //  var testvar = HttpContext.Request.Query["ClientHashKey"].ToString();
+                //if (await CheckHash(obj.chunkData, obj.ClientHashKey))
                 //{
-                    await _fileHandler.UploadChunks(obj);
-                //}
-                //else
-                //{
-                //    return false;
-                //}
+                await _fileHandler.UploadChunks(obj);
+                // }
+                //  else
+                //  {
+                //      return false;
+                //  }
                 return true;
             }
             catch (Exception ex)
@@ -111,6 +131,7 @@ namespace HopOn.Controller
             return await _fileHandler.completed(obj);
 
         }
+       
         [HttpPost("UploadInOneCall")]
         public async Task<bool> UploadInOneCall(UploadInOneCallModel obj)
         {
