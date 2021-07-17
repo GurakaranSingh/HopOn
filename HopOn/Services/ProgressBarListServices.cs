@@ -5,6 +5,7 @@ using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace HopOn.Services
@@ -13,12 +14,14 @@ namespace HopOn.Services
     {
         #region Property  
         private readonly AppDBContext _appDBContext;
+        //private readonly IFileHandler _fileHandler;
         #endregion
 
         #region Constructor  
         public ProgressBarListServices(AppDBContext appDBContext)
         {
             this._appDBContext = appDBContext;
+           // this._fileHandler = fileHandler;
         }
         #endregion
         public async Task<bool> DeleteProgressFileAsync(string AWSID)
@@ -29,7 +32,7 @@ namespace HopOn.Services
                 if (RemoveModel != null)
                 {
                     _appDBContext.Remove(RemoveModel);
-                    await _appDBContext.SaveChangesAsync(); 
+                    await _appDBContext.SaveChangesAsync();
                 }
             }
             catch (Exception ex)
@@ -39,7 +42,7 @@ namespace HopOn.Services
             }
             return true;
         }
-        public async Task<List<ProgressBarList>> GetListAsync(FileStatus status , DateTime Date)
+        public async Task<List<ProgressBarList>> GetListAsync(FileStatus status, DateTime Date)
         {
             return await _appDBContext.ProgressBarLists.Where(s => s.Status == status).Distinct().ToListAsync();
         }
@@ -64,7 +67,7 @@ namespace HopOn.Services
             throw new NotImplementedException();
         }
 
-       public void InsertProgressFileAsync(ProgressBarList ProgressFile)
+        public void InsertProgressFileAsync(ProgressBarList ProgressFile)
         {
             try
             {

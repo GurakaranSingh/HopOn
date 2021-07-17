@@ -1,114 +1,265 @@
-﻿@using HopOn.Services;
+﻿@using HopOn.Pages.SharedFile
 @inherits FileListBaseClass
-    <style>
-        #customers {
-            font-family: Arial, Helvetica, sans-serif;
-            border-collapse: collapse;
+<style>
+    #customers {
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+        #customers td, #customers th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        #customers tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #customers tr:hover {
+            background-color: #ddd;
+        }
+
+        #customers th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #04AA6D;
+            color: white;
+        }
+
+    .card-deck.custom_card {
+        position: relative;
+    }
+
+
+    .file_list .card-deck.custom_card .card .card-header {
+        background-color: #efefef;
+        border-bottom: none;
+        padding: 10px 20px;
+        position: relative;
+        width: 100%;
+        display: flex;
+        z-index: 99;
+    }
+
+
+    .card-header input[type=checkbox] {
+    }
+
+    .file_list .card-deck.custom_card .card .card-header h3 {
+        font-size: 14px;
+        margin: 3px 4px;
+    }
+
+
+    .kebab {
+        cursor: pointer;
+        position: absolute;
+        display: inline-block;
+        box-sizing: border-box;
+        padding: 0 16px;
+        top: 9px;
+        right: 0;
+        z-index: 999;
+    }
+
+        .kebab figure {
+            width: 4px;
+            height: 4px;
+            border-radius: 5px;
+            background: #00bcd4;
+            margin: 3px 4px;
+        }
+
+    .middle {
+        transition: all 0.25s cubic-bezier(0.72, 1.2, 0.71, 0.72);
+        transform: scale(1);
+        position: relative;
+        box-shadow: 0 0.1px 0.1px 0 rgba(0, 0, 0, 0.16), 0 0.1px 0.3px 0 rgba(0, 0, 0, 0.12);
+        -webkit-filter: blur(0.1px);
+        filter: blur(0.1px);
+    }
+
+        .middle.active {
+            transform: scale(4.5);
+            transition: all 0.25s cubic-bezier(0.32, 2.04, 0.85, 0.54);
+            box-shadow: 0 0.1px 0.1px 0 rgba(0, 0, 0, 0.16), 0 0.1px 0.3px 0 rgba(0, 0, 0, 0.12);
+        }
+
+    .cross {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        margin-top: -1px;
+        font-family: "Nunito", sans-serif;
+        color: white;
+        transition: all 0.2s cubic-bezier(0.72, 1.2, 0.71, 0.72);
+        font-size: 22px;
+        user-select: none;
+    }
+
+        .cross.active {
+            transform: translate(-50%, -50%) scale(1);
+            transition: all 0.15s cubic-bezier(0.32, 2.04, 0.85, 0.54);
+        }
+
+
+    .card-deck.custom_card .nav {
+        margin-left: 20%;
+    }
+
+        .card-deck.custom_card .nav > li {
+            display: inline-block;
+            padding: 1em 18px;
+            cursor: pointer;
+        }
+
+            .card-deck.custom_card .nav > li:hover {
+                background: #ebebeb;
+            }
+
+    .card-deck.custom_card .dropdown {
+        position: absolute;
+        right: 0;
+        top: 2.2em;
+        transition: all 0.25s ease-out;
+        transform: scale(0);
+        transform-origin: 100% 0;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .card-deck.custom_card ul.dropdown {
+        margin: 0;
+        padding: 0;
+    }
+
+    .card-deck.custom_card .dropdown li {
+        display: block;
+        width: 100%;
+    }
+
+        .card-deck.custom_card .dropdown li a {
             width: 100%;
+            padding: 10px 8px;
+            display: inline-block;
+            white-space: pre;
+            box-sizing: border-box;
         }
 
-            #customers td, #customers th {
-                border: 1px solid #ddd;
-                padding: 8px;
+            .card-deck.custom_card .dropdown li a:hover {
+                background: #ebebeb;
             }
 
-            #customers tr:nth-child(even) {
-                background-color: #f2f2f2;
-            }
+    .card-deck.custom_card .dropdown:hover ul {
+        transform: scale(1);
+        margin: 0;
+        padding: 0;
+        width: 122px;
+    }
 
-            #customers tr:hover {
-                background-color: #ddd;
-            }
+    .card-deck.custom_card .dropdown.active {
+        transform: scale(1);
+        transition: all 0.25s cubic-bezier(0.5, 1.8, 0.9, 0.8);
+        background-color: #fff;
+    }
 
-            #customers th {
-                padding-top: 12px;
-                padding-bottom: 12px;
-                text-align: left;
-                background-color: #04AA6D;
-                color: white;
-            }
-    </style>
-    <h3>File List</h3>
-    <div>
-        <button class="btn btn-primary" id="DownloadSelectedFile" onclick="DownloadDeleteMultiPel('Download')" style="display:none">
-            Download Selected File
-        </button>
-        <button class="btn btn-primary" id="DeleteSelectedFile" onclick="DownloadDeleteMultiPel('Delete')" style="display:none">
-            Delete Selected File
-        </button>
-    </div>
-    <div class="card-deck">
-        @if (FileLists != null)
+    .card-deck.custom_card .img-card img {
+        width: 192px;
+        height: 200px;
+        object-fit: cover;
+    }
+</style>
+
+<h3>File List</h3>
+<div>
+    <button class="btn btn-primary" id="DownloadSelectedFile" onclick="DownloadDeleteMultiPel('Download')" style="display:none">
+        Download Selected File
+    </button>
+    <button class="btn btn-primary" id="DeleteSelectedFile" onclick="DownloadDeleteMultiPel('Delete')" style="display:none">
+        Delete Selected File
+    </button>
+</div>
+<div class="card-deck custom_card">
+    @if (FileLists != null)
+    {
+        @foreach (var File in FileLists)
         {
-            @foreach (var File in FileLists)
-            {
-                <div class="card m-3" style="min-width: 18rem; max-width:24.5%;">
-
-                    <div class="card-header">
-                        <input type="checkbox" name="chk" id="@File.AwsId" onclick="checkValue('@File.AwsId', '@File.Guid', '@File.FileName')" /> <h3>@File.FileName</h3>
-                    </div>
-                    <img class="card-img-top imageThumbnail" style="width: 55%;align-content: center;" src="@File.FilePath" />
-                    <div class="card-footer text-center">
-
-                        <a href="javascript:void(0)" class="btn btn-danger m-1" onclick="ShareFile('@File.Guid')">Share File</a>
-                        <a href="api/Upload/DownloadAWSFile/@File.Guid" id="@File.Guid" class="btn btn-primary m-1">Download</a>
-                        <a href="javascript:void(0)" class="btn btn-danger m-1" onclick="DeleteFile('@File.Guid')">Delete</a>
-
-                    </div>
+            <div class="card m-3" style="min-width: 18rem; max-width:24.5%;">
+                <div class="card-header">
+                    <input type="checkbox" name="chk" id="@File.AwsId" onclick="checkValue('@File.AwsId', '@File.Guid', '@File.FileName')" /> <h3>@File.FileName</h3>
                 </div>
-            }
+                <ul class="nav">
+                    <div class="kebab @File.Guid" id="k_@File.Guid" onclick="ShowIcon('@File.Guid')">
+                        <figure></figure>
+                        <figure class="middle" id="m_@File.Guid"></figure>
+                        <p class="cross" id="c_@File.Guid">x</p>
+                        <figure></figure>
+                        <ul class="dropdown" id="d_@File.Guid">
+                            <li><a href="javascript:void(0)" class="" @onclick="()=>ShowLinkModelMethod(File.Guid)">Share File</a></li>
+                            <li><a href="api/Upload/Download/@File.Guid" id="@File.Guid" class="">Download</a></li>
+                            <li><a href="javascript:void(0)" class="" onclick="DeleteFile('@File.Guid')">Delete</a></li>
+                        </ul>
+                    </div>
+                </ul>
+
+                <div class="img-card">
+                    <img class="card-img-top imageThumbnail" src="@File.FilePath" />
+                </div>
+            </div>
         }
-        <button class="btn btn-outline-secondary" id="FileListRefresh" style="display:none" @onclick="FileListRefresh">
-            FileListRefresh
-        </button>
-    </div>
+    }
+    <button class="btn btn-outline-secondary" id="FileListRefresh" style="display:none" @onclick="FileListRefresh">
+        FileListRefresh
+    </button>
+</div>
 
-    <!-- Modal -->
-    <div class="modal" tabindex="-1" role="dialog" id="DeleteConfirmModal" style="display:none">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header"style="background-color: #337ab7;">
-                    <h4 class="modal-title" id="exampleModalLongTitle">Are you sure you want to delete the below files</h4>
-                    <button type="button" class="close" data-dismiss="modal"onclick="closeModel('Delete')" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <table id="customers">
-                        <tr id="FirstHead">
-                            <th>File Name</th>
-                            <th></th>
-                        </tr>
-                    </table>
-
-                    </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" onclick="closeModel('Delete')" data-dismiss="modal">cancle</button>
-                    <button type="button" class="btn btn-success"onclick="ConfirmDelete()">Confirm</button>
-                </div>
+<!-- Modal -->
+<div class="modal" tabindex="-1" role="dialog" id="DeleteConfirmModal" style="display:none">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #337ab7;">
+                <h4 class="modal-title" id="exampleModalLongTitle">Are you sure you want to delete the below files</h4>
+                <button type="button" class="close" data-dismiss="modal" onclick="closeModel('Delete')" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="customers">
+                    <tr id="FirstHead">
+                        <th>File Name</th>
+                        <th></th>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" onclick="closeModel('Delete')" data-dismiss="modal">cancle</button>
+                <button type="button" class="btn btn-success" onclick="ConfirmDelete()">Confirm</button>
             </div>
         </div>
     </div>
-
-    <div class="modal" tabindex="-1" role="dialog" id="ShareFileLink" style="display:none">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header" style="background-color: #337ab7;">
-                    <h4 class="modal-title" id="exampleModalLongTitle">File link</h4>
-                    <button type="button" class="close" data-dismiss="modal" onclick="closeModel('Share')" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+</div>
+@if (ShowLinkModel) { 
+<div class="modal" tabindex="-1" role="dialog" id="ShareFileLink" style="display:inline-block">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"style="width: max-content;">
+            <div class="modal-header" style="background-color: #337ab7;">
+                <h4 class="modal-title" id="exampleModalLongTitle">Shared links</h4>
+                <button type="button" class="close" data-dismiss="modal" onclick="closeModel('Share')" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="FileRefreshDiv">
+                    <SharedFileList CurrentFileGuid =@CurrentFileGuid></SharedFileList>
                 </div>
-                <div class="modal-body">
-                    <div class="col-lg-12">
-                        <input type="Text" name="ShareableLink"style="width: 100%;" id="ShareLink" value="" />
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" onclick="closeModel('Share')" data-dismiss="modal">cancle</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" onclick="closeModel('Share')" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
+</div>
+}
 

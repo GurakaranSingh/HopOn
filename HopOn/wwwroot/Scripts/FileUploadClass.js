@@ -16,7 +16,7 @@ var time;
 var speedInMbps;
 var IsStopTrue = false;
 var IsNetworFail = false;
-var next_slice = 0;
+//var next_slice = 0;
 var _amazonunqID = "";
 var Guid = "";
 var FinalChunkSize = 0;
@@ -28,7 +28,7 @@ class FileUpload {
 
     constructor() {
     }
-
+    
 
     start_upload(files, index) {
         //files = document.getElementById("fileToUpload").files;
@@ -49,11 +49,27 @@ class FileUpload {
                 //displaySpeed();
                 var amazonID = "'" + result.uploadId + "'";
                 filelistcomponnent.insertAdjacentHTML("afterend",
-                    '<div class="col-md-12" id="divcomponentID_' + result.uploadId + '"><h3 class= "progress-title">' + files.name + ': </h3 ><div class="progress"><div class= "progress-bar" id="progressbarid_' + result.uploadId + index + '" style = "width:0%; background:#97c513;" ><div class="progress-value" id="progressbarvalue_' + result.uploadId + index + '">0%</div></div></div><p><button type="button" id="start_' + result.uploadId + '"class="btn btn-success" style="display:inline-block" onclick="upload_file(' + 0 + ',' + amazonID + ',' + index + ')">Start</button><button type="button" class= "btn btn-warning" style="display:none" id="pause_' + result.uploadId + '"onclick = "PauseUploading(' + amazonID + ')"> Pause</button><button type="button" id="resume_' + result.uploadId + '" class="btn btn-primary" style="display:none" onclick="ResumeUploading(' + amazonID + ')">Resume</button><button type="button" class="btn btn-danger" style="display:none" id="cancel_' + result.uploadId + '" onclick="CancelUploading(' + amazonID + ')">Cancel</button><button type="button" id="Remove_' + result.uploadId + '"class="btn btn-danger" style="display:none" onclick="CancelUploading(' + amazonID + ')">Remove</button><button type="button" id="Retry_' + result.uploadId + '" class="btn btn-danger" style="display:none" onclick="ReTryUploading(' + amazonID + ')">Retry</button><span style="margin-left: 136px;" id="UploadTime_' + result.uploadId + '"></span></p></div>');
+                    '<div class="col-md-12" id="divcomponentID_' + result.uploadId + '">' +
+                    '<h3 class= "progress-title">' + files.name + ': </h3>' +
+                    '<div class="progress">' +
+                    '<div class="progress-bar" id="progressbarid_' + result.uploadId + '" style="width:0%; background:#97c513;">' +
+                    '<div class="progress-value" id="progressbarvalue_' + result.uploadId + '">0%</div>' +
+                    '</div >' +
+                    '</div >' +
+                    '<p>' +
+                    '<button type="button" id="start_' + result.uploadId + '" class="btn btn-success" style="display:inline-block" onclick="upload_file(' + 0 + ',' + amazonID + ',' + index + ')">Start</button>' +
+                    '<button type="button" class="btn btn-warning" style="display:none" id="pause_' + result.uploadId + '" onclick="PauseUploading(' + amazonID + ')"> Pause</button>' +
+                    '<button type="button" id="resume_' + result.uploadId + '" class="btn btn-primary" style="display:none" onclick="ResumeUploading(' + amazonID + ')">Resume</button>' +
+                    '<button type="button" class="btn btn-danger" style="display:none" id="cancel_' + result.uploadId + '" onclick="CancelUploading(' + amazonID + ')">Cancel</button>' +
+                    '<button type="button" id="Remove_' + result.uploadId + '" class="btn btn-danger" style="display:none" onclick="CancelUploading(' + amazonID + ')">Remove</button>' +
+                    '<button type="button" id="Retry_' + result.uploadId + '" class="btn btn-danger" style="display:none" onclick="ReTryUploading(' + amazonID + ')">Retry</button>' +
+                    '<span style="margin-left: 136px;" id="UploadTime_' + result.uploadId + '"></span>' +
+                    '</p>' +
+                    '</div > ');
             }
         };
         var obj = {
-            fileSize: files.size.toString(),
+            fileSize: files.size,
             fileName: files.name.toString(),
             Guid: Guid,
         }
@@ -77,6 +93,7 @@ class FileUpload {
             return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
         });
     }
+  
     UploadInOneCall(file, amazonunqID, Guid, index) {
         var reader = {};
         reader = new FileReader();
@@ -100,6 +117,7 @@ class FileUpload {
                 FileName: file.File.name,
                 //FilePath: "C:\\Users\\gurkaran.singh\\Downloads\\UploadUtilityHelper.cs",
                 //awsUniqueId: amazonunqID,
+                FileSize: file.File.size,
                 ContentType: file.File.type,
                 File: FileBase64Sting,
                 awsUniqueId: amazonunqID,
@@ -109,8 +127,8 @@ class FileUpload {
             xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
             xhr.send(JSON.stringify(obj));
 
-            var Progressbaraid = 'progressbarid_' + amazonunqID + index;
-            var Progressvalueid = 'progressbarvalue_' + amazonunqID + index;
+            var Progressbaraid = 'progressbarid_' + amazonunqID;
+            var Progressvalueid = 'progressbarvalue_' + amazonunqID;
             document.getElementById(Progressbaraid).style.width = 100 + '%';
             document.getElementById(Progressvalueid).innerHTML = 100 + '%';
             document.getElementById(Progressvalueid).innerHTML = 'Server is merging chunk please wait!.';
@@ -142,13 +160,13 @@ class FileUpload {
 
         // ChucksCount = file.File.size / slice_size;
         //if (ChucksCount.toString().split('.')[1] > 0) { ChucksCount = + parseInt(ChucksCount.toString().split('.')[0]) + 1 }
-        next_slice = start + slice_size + 1;
+        var next_slice = start + slice_size + 1;
         blob = file.File.slice(start, next_slice);
         if (next_slice > file.File.size) {
             next_slice = file.File.size;
             blob = file.File.slice(start);
         }
-        
+
         reader.onload = function (event) {
             if (event.target.readyState !== FileReader.DONE) {
                 return;
@@ -159,6 +177,24 @@ class FileUpload {
             if (!IsStopTrue && !IsNetworFail) {
                 xhr.onload = function () {
                     if (xhr.status == 200) {
+                         
+                        if (xhr.response == "507") {
+                            debugger
+                           
+                            IsStopTrue = true
+                            new FileUpload().SHowHideButtonsOnStart(amazonunqID);
+                            document.getElementById("pause_" + amazonunqID).style.display = "none";
+                            document.getElementById("cancel_" + amazonunqID).style.display = "none";
+                            document.getElementById("Remove_" + amazonunqID).style.display = "inline-block";
+                            document.getElementById('progressbarid_' + amazonunqID).innerHTML = 'Insufficient Storage';
+                            document.getElementById('progressbarid_' + amazonunqID).style.width = 100 + '%';
+                            if (next_slice < file.File.size) {
+                                // Update upload progress
+                                // More to upload, call function recursively
+                                chunkIndex = chunkIndex + 1;
+                                new FileUpload().upload_file(next_slice, amazonunqID, index);
+                            }
+                        }
                         console.log(ChucksCount);
                         var result = JSON.parse(xhr.responseText);
                         //var Tags = { PartNumber: result["model"].partNumber, ETag: result["model"].eTag }
@@ -166,18 +202,22 @@ class FileUpload {
                         end_time = new Date();
                         var size_done = start + slice_size;
                         var percent_done = Math.floor((size_done / file.File.size) * 100);
-                        debugger
-                       
-                        var Progressbaraid = 'progressbarid_' + amazonunqID + index;
-                        var Progressvalueid = 'progressbarvalue_' + amazonunqID + index;;
-                        if (percent_done > 100) { percent_done = 100; }
-                        //var UploadTime = 'UploadTime_' + file.File.name
-                        if (!IsStopTrue) {
-                            debugger
-                            document.getElementById(Progressbaraid).style.width = percent_done + '%';
-                            document.getElementById(Progressvalueid).innerHTML = percent_done + '%';
+                         
+                        if (document.getElementById('progressbarvalue_' + amazonunqID) != null) {
+                            if (document.getElementById('progressbarid_' + amazonunqID).innerHTML != "Insufficient Storage") {
+                                var Progressbaraid = 'progressbarid_' + amazonunqID;
+                                var Progressvalueid = 'progressbarvalue_' + amazonunqID;
+                                console.log("ProgresbaarID = " + Progressbaraid + " Percentage = " + percent_done);
+                                if (percent_done > 100) { percent_done = 100; }
+                                //var UploadTime = 'UploadTime_' + file.File.name
+                                if (!IsStopTrue) {
+                                    document.getElementById(Progressbaraid).style.width = percent_done + '%';
+                                    document.getElementById(Progressvalueid).innerHTML = percent_done + '%';
+                                }
+                                if (document.getElementById(Progressvalueid).innerHTML != 'Insufficient Storage')
+                                    if (percent_done == 100) { document.getElementById(Progressvalueid).innerHTML = 'Server is merging chunk please wait!.'; }
+                            }
                         }
-                        if (percent_done == 100) { document.getElementById(Progressvalueid).innerHTML = 'Server is merging chunk please wait!.'; }
                         DataTransfer = DataTransfer + slice_size;
                         //document.getElementById(UploadTime).innerHTML = speedInMbps == undefined || speedInMbps < 0 ? 0 : speedInMbps + " Mbps";//displaySpeed(time_start, end_time, DataTransfer)
                         if (next_slice < file.File.size) {
@@ -187,8 +227,10 @@ class FileUpload {
                             new FileUpload().upload_file(next_slice, amazonunqID, index);
                         }
                         else {
+                             
                             // Update upload progress
                             //FInal Method call
+                            document.getElementById(Progressvalueid).innerHTML = 'Server is merging chunk please wait!.';
                             new FileUpload().FinalCallMerging(amazonunqID, file, ChucksCount)
                         }
                     }
@@ -262,10 +304,9 @@ class FileUpload {
                 for (var i = 0; i < MultiFileSelectArray.length; i++) {
                     // DownloadFile(MultiFileSelectArray[i])
                     if (MultiFileSelectArray[i] != "undefined" && MultiFileSelectArray[i] != undefined)
-                        // window.location = window.location.href + "api/Upload/DownloadAWSFile/" + MultiFileSelectArray[i];
+                        // window.location = window.location.href + "api/Upload/Download/" + MultiFileSelectArray[i];
                         var FileId = MultiFileSelectArray[i];
-
-                    var url = window.location.href + "api/Upload/DownloadAWSFile/" + FileId
+                    var url = window.location.href + "api/Upload/Download/" + FileId
                     window.open(url, '_blank');
                     //document.getElementById(FileId).click();
                 }
@@ -332,20 +373,19 @@ class FileUpload {
             prevETags: null,
             fileName: file.File.name,
             PartNumber: PartNumber,
-            FileSize: file.File.size.toString(),
+            FileSize: file.File.size,
             Guid: file.Guid,
-            ChucksCount: ChucksCount
+            ChucksCount: ChucksCount,
+            FileType: file.File.type
         }
         xhr.open("POST", "api/Upload/FinalCallFOrCHunk");
         xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
         xhr.send(JSON.stringify(obj));
     }
 
-
-    SHowHideButtonsOnStart(amazonunqID) {
+    SHowHideButtonsOnStart(amazonunqID ) {
         document.getElementById("start_" + amazonunqID).style.display = "none";
         document.getElementById("cancel_" + amazonunqID).style.display = "inline-block";
-
         if (!IsStopTrue)
             document.getElementById("pause_" + amazonunqID).style.display = "inline-block";
     }
@@ -357,17 +397,14 @@ class FileUpload {
                 console.log("ENd Time = " + end_time + "  " + " Start Time = " + time_start);
                 var timeDuration = (end_time - time_start) / 1000;
                 var loadedBits = DataTransfer;
-
                 /* Converts a number into string
                    using toFixed(2) rounding to 2 */
                 var bps = (loadedBits / timeDuration).toFixed(2);
                 var speedInKbps = (bps / 1024).toFixed(2);
                 speedInMbps = (speedInKbps / 1024).toFixed(2);
-
                 console.log("bps= " + bps);
                 console.log("loadedBits= " + loadedBits);
                 console.log("timeDuration= " + timeDuration);
-
                 //console.log("Your internet connection speed is: \n"
                 //    + bps + " bps\n" + speedInKbps
                 //    + " kbps\n" + speedInMbps + " Mbps\n");
@@ -384,7 +421,6 @@ class FileUpload {
         document.getElementById("resume_" + amazonunqID).style.display = "inline-block";
     }
     NetworkIssue(amazonunqID, FileName) {
-
         IsNetworFail = true;
         document.getElementById("Retry_" + amazonunqID).style.display = "inline-block";
         document.getElementById("UploadTime_" + FileName).style.display = "none";
@@ -411,7 +447,6 @@ class FileUpload {
         upload_file(next_slice, _amazonunqID);
     }
     DeleteFile(FileName) {
-
         //Saving chunk file
         var xhr = new XMLHttpRequest();
         xhr.onload = function () {

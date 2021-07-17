@@ -1,0 +1,12 @@
+E:\HopOn\GitCopy\HopOn.Model\bin\Release\net5.0\HopOn.Model.deps.json
+E:\HopOn\GitCopy\HopOn.Model\bin\Release\net5.0\HopOn.Model.dll
+E:\HopOn\GitCopy\HopOn.Model\bin\Release\net5.0\ref\HopOn.Model.dll
+E:\HopOn\GitCopy\HopOn.Model\bin\Release\net5.0\HopOn.Model.pdb
+E:\HopOn\GitCopy\HopOn.Model\obj\Release\net5.0\HopOn.Model.csproj.AssemblyReference.cache
+E:\HopOn\GitCopy\HopOn.Model\obj\Release\net5.0\HopOn.Model.GeneratedMSBuildEditorConfig.editorconfig
+E:\HopOn\GitCopy\HopOn.Model\obj\Release\net5.0\HopOn.Model.AssemblyInfoInputs.cache
+E:\HopOn\GitCopy\HopOn.Model\obj\Release\net5.0\HopOn.Model.AssemblyInfo.cs
+E:\HopOn\GitCopy\HopOn.Model\obj\Release\net5.0\HopOn.Model.csproj.CoreCompileInputs.cache
+E:\HopOn\GitCopy\HopOn.Model\obj\Release\net5.0\HopOn.Model.dll
+E:\HopOn\GitCopy\HopOn.Model\obj\Release\net5.0\ref\HopOn.Model.dll
+E:\HopOn\GitCopy\HopOn.Model\obj\Release\net5.0\HopOn.Model.pdb

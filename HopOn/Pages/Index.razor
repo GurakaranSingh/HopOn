@@ -1,12 +1,86 @@
 ﻿@page "/" 
+
+<style>
+
+
+    .post-content {
+        width: 100%;
+        float: left;
+        padding: 10px 20px;
+        margin-top: 20px;
+    }
+    .post-content h3 {
+        font-size: 20px;
+        margin-bottom: 0;
+    }
+
+        .post-content label {
+            background-color: #d7edf9;
+            border-left: 1px solid #2980b9;
+            padding: 10px 10px;
+            font-size: 14px;
+            width: 100%;
+            margin: 10px 0 20px 0;
+            color: #333;
+        }
+
+
+        .post-content .Cus_fileupload {
+            border: 2px dashed #ccc;
+            width: 100%;
+            float: left;
+            color: #595959;
+            text-align: center;
+            border-radius: 5px;
+            padding: 15px;
+            height: 100px;
+            position:relative;
+            overflow:hidden;
+        }
+
+        .post-content .Cus_fileupload:hover {
+            border-color: #454cad;
+        }
+
+    .file_list {
+        width:100%;
+        float:left;
+    }
+
+        .file_list h3 {
+            font-size: 25px;
+        }
+
+        .file_list .card {
+            border-radius: 5px;
+            -webkit-box-shadow: 0 0 5px 0 rgba(43, 43, 43, .1), 0 11px 6px -7px rgba(43, 43, 43, .1);
+            box-shadow: 0 0 5px 0 rgba(43, 43, 43, .1), 0 11px 6px -7px rgba(43, 43, 43, .1);
+            border: none;
+            margin-bottom: 30px;
+            -webkit-transition: all .3s ease-in-out;
+            transition: all .3s ease-in-out
+        }
+
+            .file_list .card .card-header {
+                background-color: transparent;
+                border-bottom: none;
+                padding: 20px;
+                position: relative
+            }
+
+    .img-card {
+        width:100%;
+        float:left;
+    }
+</style>
     <div class="row">
         <div class="col-lg-9">
-            <section class="post-content">
+            <section class="post-content card">
                 <FileUpload />
             </section>
             <hr />
 
-            <section>
+            <section class="file_list">
                 <FileList />
             </section>
             <hr />

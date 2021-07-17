@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Contract\IFileUploadServices.cs" />
+    <Compile Remove="Services\AWSApiFileHandler.cs" />
+    <Compile Remove="Services\FileUploadServices.cs" />
+    <Compile Remove="Services\MinioFileHandler.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="3.7.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HopOn.Model\HopOn.Model.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -96,13 +96,47 @@ namespace HopOn.Services
                 throw;
             }
         }
+        public async Task<HttpStatusCode> DeleteUncompleteCHunks()
+        {
+            try
+            {
+                HttpStatusCode response = HttpStatusCode.NoContent;
+                DateTime CurrentDate = DateTime.Now.AddDays(-2);
+                List<ProgressBarList> AmazonID = await _ProgressBarListServices.GetListAsync(FileStatus.Fail, CurrentDate);
+                if (AmazonID.Count > 0)
+                {
+                    foreach (var item in AmazonID)
+                    {
+                        UpdateFileStatus model = new UpdateFileStatus()
+                        {
+                            awsUniqueId = item.AwsId,
+                            Guid = item.Guid,
+                        };
+                        response = await AbortFileStatus(model);
+
+                        if (response == HttpStatusCode.OK)
+                        {
+                            await _ProgressBarListServices.DeleteEtags(item.AwsId);
+                        }
+                    }
+                    return response;
+                }
+                else
+                {
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                return HttpStatusCode.BadRequest;
+            }
+        }
         private void InsertProgressBar(ProgressBarList ProgressList)
         {
             _ProgressBarListServices.InsertProgressFileAsync(ProgressList);
         }
         public async Task<HttpStatusCode> AbortFileStatus(UpdateFileStatus request)
         {
-
             try
             {
                 var response = await _s3Client.AbortMultipartUploadAsync(new AbortMultipartUploadRequest
@@ -350,7 +384,7 @@ namespace HopOn.Services
             }
         }
         
-        public async Task<FileStreamResult> DownloadAWSFile(string Guid)
+        public async Task<FileStreamResult> Download(string Guid)
         {
             try
             {

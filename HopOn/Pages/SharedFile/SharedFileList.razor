@@ -1,0 +1,39 @@
+﻿@inherits SharedFileListBaseClass
+
+<p>
+    Generate New Link
+    <select id="selection" @onchange="GenerateLink">
+        <option>-Select Type-</option>
+        <option>@ShareLink</option>
+        <option>@GenerateToken</option>
+    </select>
+</p>
+<br />
+<div class="row">
+    <div class="col-lg-12" id="shareTextBox">
+        <table id="customers">
+            <tr id="filelink">
+                <th>Link</th>
+                <th>Token</th>
+                <th></th>
+                @*<th></th>*@
+            </tr>
+            @if (LinkModel != null)
+            {
+                @foreach (var Link in LinkModel)
+                {
+                    <tr>
+                        <td>@Link.FileLink</td>
+                        <td>@Link.FileToken</td>
+                        <td>@Link.Expired</td>
+                        <td style="display:none"> <button class="btn btn-outline-secondary" id="GeneratedLinkListRefresh_@Link.FileId" style="display:inline-block" @onclick="() =>GeneratedLinkRefresh(Link.FileId)">static</button></td>
+                    </tr>
+                }
+            }
+        </table>
+    </div>
+
+</div>
+
+
+

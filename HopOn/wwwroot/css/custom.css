@@ -1,0 +1,240 @@
+body {
+    background-color: #dce1e6;
+}
+
+.upload_container {
+    background-color: #fff;
+    border-radius: 4px;
+    position: relative;
+    padding: 15px;
+    width: 100%;
+    float: left;
+}
+
+.text-area {
+    width: 100%;
+    float: left;
+    display: flex;
+}
+
+.text-area textarea {
+border-color:#dadada;
+border-top:0;
+border-right:0;
+border-left:0;
+}
+
+textarea:focus { 
+    outline: none !important;
+    border-color: #719ECE;
+    box-shadow: 0;
+}
+
+.camera-uplod {
+    border-radius: 50%;
+    transform: rotateY(0deg);
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    color: #A4ACB5;
+    font-size: 22px;
+  }
+  ::-moz-placeholder { /* Firefox 19+ */
+    color: #A4ACB5;
+    font-size: 22px;
+  }
+  :-ms-input-placeholder { /* IE 10+ */
+    color: #A4ACB5;
+    font-size: 22px;
+  }
+  :-moz-placeholder { /* Firefox 18- */
+    color: #A4ACB5;
+    font-size: 22px;
+  }
+.filter-upload {
+    width: 100%;
+    float: left;
+    text-align: right;
+    margin: 20px 0px;
+    border-top: 1px solid #f0f0f0;
+}
+.filter-upload .filltersect {
+    margin-top: 15px;
+    width: 100%;
+    float: left;
+}
+
+.filter-upload .filltersect  a {
+    margin-right: 30px;
+}
+
+.btn {
+    padding: 8px 30px;
+}
+
+.filter-upload .upload_icon {
+    width: 30px;
+}
+
+#upldpictrModal .modal-header {
+    padding: 15px;
+    border-bottom: 1px solid #e5e5e5;
+    background-color: #5181b8;
+    color: #fff;
+ 
+}
+
+#upldpictrModal .modal-header h4 {
+    font-size: 16px;
+}
+
+.uploadpopphoto  {
+    background-color:#e5ebf1;
+    padding: 8.5px 10px;
+    text-align: center;
+    width: 100%;
+    position: relative;
+}
+
+.uploadpopphoto .upload_area_upload {
+    display: block;
+    width: 100%;
+    
+}
+.uploadpopphoto .uploadphoto {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width:100%;
+    height: 100%;
+    float: left;
+
+}
+
+.close {
+    float: right;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-shadow: 0 1px 0 #fff;
+    filter: alpha(opacity=20);
+    opacity: .8;
+}
+
+.empty-contr {
+    padding: 100px 20px;
+    text-align: center;
+}
+
+.gallery_container {
+    width:100%;
+    float: left;
+}
+
+.choose_uploadarea {
+    width: 100%;
+    padding: 10px;
+    display: block;
+}
+
+.thumnail_photo {
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    margin-bottom:20px;
+}
+
+.thumnail_photo .thumbimg {
+    width: 260px;
+    height: 169px;
+    cursor: pointer;
+    position: relative;
+}
+
+.thumnail_photo .thumbimg .thmb-pic {
+    object-fit: cover;
+    width: 260px;
+    height: 169px;
+   
+}
+
+.thumnail_photo .cross-icn {
+    position: absolute;
+    top: -6px;
+    right: -4px;
+    width: 25px;
+    height: 25px;
+    z-index: 99;
+    
+}
+.overlay {
+    background-color: #fdfdfd;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.5;
+    z-index: 9;
+}
+
+.thumaismall {
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: repeat(4, 1fr);
+    margin-bottom: 20px;
+}
+
+.thumaismall .thumbimg {
+    width: 196px;
+    height: 100px;
+    cursor: pointer;
+    position: relative;
+}
+
+
+.thumaismall .cross-icn {
+    position: absolute;
+    top: -6px;
+    right: -4px;
+    width: 25px;
+    height: 25px;
+    z-index: 99;
+    
+}
+
+
+.thumaismall  .thumbimg .thmb-pic {
+    object-fit: cover;
+    width: 196px;
+    height: 100px;
+   
+}
+
+.progressbarsec {
+    width:100%;
+    float: left;
+    position: relative;
+    display: flex;
+   
+}
+
+.progressbarsec .progress {
+    height: 12px;
+    margin-bottom: 14px;
+    width: 95%;
+    margin: 0;
+}
+
+.progressbarsec .prgress_clos {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    right: 0;
+    top: -5px;
+}

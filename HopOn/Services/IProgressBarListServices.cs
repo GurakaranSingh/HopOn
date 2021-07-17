@@ -3,6 +3,7 @@ using HopOn.Model.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace HopOn.Services
@@ -16,5 +17,6 @@ namespace HopOn.Services
         Task<bool> DeleteProgressFileAsync(string AWSID);
         Task<List<ProgressBarList>> GetListAsync(FileStatus status, DateTime Date);
         Task DeleteEtags(string Awsid);
+        
     }
 }

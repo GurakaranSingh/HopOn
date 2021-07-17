@@ -7,12 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Controller\ValuesController.cs" />
+    <Compile Remove="Pages\DeleteFile\**" />
+    <Compile Remove="Services\**" />
+    <Content Remove="Pages\DeleteFile\**" />
+    <Content Remove="Services\**" />
+    <EmbeddedResource Remove="Pages\DeleteFile\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="Pages\DeleteFile\**" />
+    <None Remove="Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Controllers\ValuesController.cs" />
     <Compile Remove="Pages\Counter.razor.cs" />
     <Compile Remove="Pages\FileList.razor.cs" />
     <Compile Remove="Pages\Progressbar.razor.cs" />
-    <Compile Remove="Services\AWSApiFileHandler.cs" />
-    <Compile Remove="Services\MinioFileHandler.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,7 +43,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\HopOn.Core\HopOn.Core.csproj" />
     <ProjectReference Include="..\HopOn.Model\HopOn.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\css\fonts\glyphicons-halflings-regular.svg" />
+    <None Include="wwwroot\css\fonts\glyphicons-halflings-regular.woff2" />
   </ItemGroup>
 
 </Project>

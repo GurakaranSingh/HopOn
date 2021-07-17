@@ -1,5 +1,5 @@
 ﻿using HopOn.Model;
-using HopOn.Services;
+using HopOn.Model.ViewModel;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
@@ -11,8 +11,13 @@ namespace HopOn.Pages
     public class FileListBaseClass : ComponentBase
     {
         public List<UploadedFile> FileLists { get; set; }
+        public List<DeleteFileModel> DeleteFileList { get; set; }
+        public bool ShowLinkModel { get; set; }
+        public bool ShowDeleteModel { get; set; }
+        public string CurrentFileGuid { get; set; }
         [Inject]
         private AppDBContext _appDBContext { get; set; }
+       
         private async Task<List<UploadedFile>> GetAllFilesAsync()
         {
             try
@@ -31,6 +36,15 @@ namespace HopOn.Pages
             {
                 throw;
             }
+        }
+        public void ShowLinkModelMethod(string Guid)
+        {
+            CurrentFileGuid = Guid;
+            ShowLinkModel = true;
+        }
+        public void ShowDeleteModelMethod()
+        {
+            ShowLinkModel = true;
         }
         public async Task FileListRefresh()
         {

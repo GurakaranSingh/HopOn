@@ -1,0 +1,28 @@
+﻿@page "/Link/{FileId}"
+@inherits DownloadFileBaseClass
+@inject IJSRuntime JSRuntime;
+
+
+@if (HasToken)
+{
+    <div class="modal" tabindex="-1" role="dialog" id="ShareFileLink" style="display:inline-block">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" style="width: max-content;">
+                <div class="modal-header" style="background-color: #337ab7;">
+                    <h4 class="modal-title" id="exampleModalLongTitle">Enter Token</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="FileRefreshDiv">
+                        <input type="text" name="name" value="" @onchange="@onChange" />
+                        <br />
+                        @if (InvalidToken)
+                        {<span style="color:orangered">Token is Invalid Please Enter valid Token</span>}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" @onclick="@ValidateToken" data-dismiss="modal">Validate Token</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

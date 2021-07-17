@@ -1,22 +1,40 @@
-﻿window.returnArrayAsync = () => {
-    DotNet.invokeMethodAsync('HopOn', 'ReturnArrayAsync')
-        .then(data => {
-            var files = document.getElementById("fileToUpload").files;
-            debugger
-            var FileUploadClass = [];
-            for (let i = 0; i < files.length; i++) {
-                var FileStartObj = { AwsId: files[i] }
-                FileUploadClass[i] = new FileUpload();
-                FileUploadClass[i].start_upload(files[i], Math.random());
-            }
-            document.getElementById('AllDownloadButton').style.display = "inline-block";
-            document.getElementById('fileToUpload').value = null
-        });
-};
+﻿////window.returnArrayAsync = () => {
+////    DotNet.invokeMethodAsync('HopOn', 'ReturnArrayAsync')
+////        .then(data => {
+////            closemodel();
+////            var files = document.getElementById("fileToUpload").files;
+
+////            var FileUploadClass = [];
+////            for (let i = 0; i < files.length; i++) {
+////                FileUploadClass[i] = new FileUpload();
+////                FileUploadClass[i].start_upload(files[i], Math.random());
+////            }
+////            document.getElementById('AllDownloadButton').style.display = "inline-block";
+////            document.getElementById('fileToUpload').value = null
+////        });
+////};
+function uploadfile() {
+    debugger
+    var files = document.getElementById("fileToUpload").files;
+    var FileUploadClass = [];
+    for (let i = 0; i < files.length; i++) {
+        FileUploadClass[i] = new FileUpload();
+        FileUploadClass[i].start_upload(files[i], Math.random());
+    }
+    document.getElementById('AllDownloadButton').style.display = "inline-block";
+    document.getElementById('fileToUpload').value = null
+}
+function closemodel() {
+    window.returnArrayAsync = () => {
+        DotNet.invokeMethodAsync('HopOn', 'CloseOpenModel')
+            .then(data => {
+            });
+    };
+}
 function upload_file(start, amazonunqID, index) {
     var uploadClass = [];
     uploadClass[index] = new FileUpload();
-    uploadClass[index].upload_file(start, amazonunqID,index);
+    uploadClass[index].upload_file(start, amazonunqID, index);
 }
 function StartAllDownload() {
     var uploadClass = [];
@@ -30,7 +48,7 @@ function DeleteFile(FileName) {
     uploadClass.DeleteFile(FileName);
 }
 function DownloadDeleteMultiPel(Flag) {
-    debugger
+
     let uploadClass = new FileUpload();
     if (Flag == "Delete") {
         var filelistcomponnent = document.getElementById('FirstHead')
@@ -51,14 +69,9 @@ function DownloadDeleteMultiPel(Flag) {
         uploadClass.DownloadDeleteMultiPel(Flag);
     }
 }
-function ShareFile(Guid) {
-    debugger
-    var url = window.location.href + "api/Upload/DownloadAWSFile/" + Guid
-    document.getElementById("ShareLink").value = url
-    document.getElementById('ShareFileLink').style.display = "inline-block";
-}
+
 function RemoveItemFromList(Guid) {
-    debugger
+
     var guid = Guid;
     var row = document.getElementById(guid);
     row.parentNode.removeChild(row);
@@ -91,7 +104,7 @@ function closeModel(flag) {
                         ele[i].checked = false;
 
                 }
-                debugger
+
                 document.getElementById("DownloadSelectedFile").style.display = "none";
                 document.getElementById("DeleteSelectedFile").style.display = "none";
                 for (var i = 0; i < MultiFileSelectArray.length; i++) {
@@ -110,9 +123,10 @@ function closeModel(flag) {
                 document.getElementById('ShareFileLink').style.display = "none";
             }
     }
+    location.reload();
 }
 function checkValue(AwsId, guid, FileName) {
-    debugger
+
     let uploadClass = new FileUpload();
     uploadClass.checkValue(AwsId, guid, FileName);
 }
@@ -131,4 +145,53 @@ function ReTryUploading(amazonunqID) {
 function CancelUploading(awsid) {
     let uploadClass = new FileUpload();
     uploadClass.CancelUploading(awsid);
+}
+
+
+
+
+function ShowIcon(guid) {
+
+    var kebab = document.getElementById('k_' + guid), // document.querySelector('.kebab' + guid),
+        middle = document.getElementById('m_' + guid), //document.querySelector('.middle'),
+        cross = document.getElementById('c_' + guid), // document.querySelector('.cross'),
+        dropdown = document.getElementById('d_' + guid); //document.querySelector('.dropdown');
+
+    kebab.addEventListener('click', function () {
+
+        middle.classList.toggle('active');
+        cross.classList.toggle('active');
+        dropdown.classList.toggle('active');
+    })
+    kebab.click();
+}
+
+function downloadFromUrl(url, fileName) {
+    debugger
+    const anchorElement = document.createElement('a');
+    anchorElement.href = url;
+    anchorElement.download = fileName ?? '';
+    anchorElement.click();
+    anchorElement.remove();
+}
+function downloadFromByteArray(byteArray, fileName, contentType) {
+    debugger
+    // Convert base64 string to numbers array.
+    const numArray = byteArray;//atob(byteArray).split('').map(c => c.charCodeAt(0));
+
+    // Convert numbers array to Uint8Array object.
+    const uint8Array = new Uint8Array(numArray);
+
+    // Wrap it by Blob object.
+    const blob = new Blob([uint8Array], { type: byteArray.contentType });
+
+    // Create "object URL" that is linked to the Blob object.
+    const url = URL.createObjectURL(blob);
+    
+    // Invoke download helper function that implemented in 
+    // the earlier section of this article.
+    downloadFromUrl(url,byteArray.fileName );
+
+    // At last, release unused resources.
+    URL.revokeObjectURL(url);
 }

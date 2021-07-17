@@ -13,8 +13,9 @@ namespace HopOn.Model
         public List<EtagModel> prevETags { get; set; }
         public string fileName { get; set; }
         public int PartNumber { get; set; }
-        public string FileSize { get; set; }
+        public int FileSize { get; set; }
         public string Guid { get; set; }
+        public string FileType { get; set; }
         public int ChucksCount { get; set; }
     }
 }

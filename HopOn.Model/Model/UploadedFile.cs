@@ -13,7 +13,8 @@ namespace HopOn.Model
         public int Id { get; set; }
         public string FileName { get; set; }
         public string FilePath { get; set; }
-        public string FileSize { get; set; }
+        public int FileSize { get; set; }
+        public string FileType { get; set; }
         public string AwsId { get; set; }
         public string Guid { get; set; }
     }

@@ -1,6 +1,7 @@
+using HopOn.Core.Contract;
+using HopOn.Core.Services;
 using HopOn.Data;
 using HopOn.Model;
-using HopOn.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -64,6 +65,8 @@ namespace HopOn
 
             //services.AddProtectedBrowserStorage();
             #region Services 
+            services.AddScoped<IProgressBarListServices, ProgressBarListServices>();
+            services.AddScoped<IFileLinkService, FileLinkService>();
 
             var fileHandlerType = Configuration.GetValue<string>("MySettings:FileHandlerType");
             switch (fileHandlerType.ToLower())
@@ -84,7 +87,6 @@ namespace HopOn
             //services.AddSingleton<IUploadUtilityHelperServices, UploadUtilityHelperServices>();
             //services.AddHttpClient<IUploadUtilityHelperServices, UploadUtilityHelperServices>(client => client.BaseAddress = new Uri("https://localhost:44306/"));
             services.AddScoped<IUploadUtilityHelperServices, UploadUtilityHelperServices>();
-            services.AddScoped<IProgressBarListServices, ProgressBarListServices>();
 
             #endregion
 

@@ -14,12 +14,13 @@ namespace HopOn.Services
         Task<string> GetUploadID(GetUploadIdModel request);
         Task UploadChunks(ChunkModel request);
         Task<HttpStatusCode> completed(FinalUpload request);
-        Task<FileStreamResult> DownloadAWSFile(string FileName);
+        Task<FileStreamResult> Download(string FileName);
         Task<bool> DeleteFileFromAmazon(string FileName);
         Task<bool> CancleUploading(string AWSID);
         Task<bool> UploadInOneCall(UploadInOneCallModel request);
         Task<HttpStatusCode> UpdateFileStatus(UpdateFileStatus Status);
         Task<HttpStatusCode> AbortFileStatus(UpdateFileStatus request);
+        Task<HttpStatusCode> DeleteUncompleteCHunks();
 
     }
 }
