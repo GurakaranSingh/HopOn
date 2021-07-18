@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HopOn", "HopOn\HopOn.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HopOn.Model", "HopOn.Model\HopOn.Model.csproj", "{F984C35B-C9FE-466B-AD88-D8EC5575E7D8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HopOn.Watcher", "HopOn.Watcher\HopOn.Watcher.csproj", "{75C2B418-FEDF-4F0B-A9BB-203CCA65629B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HopOn.Core", "HopOn.Core\HopOn.Core.csproj", "{B942A201-CC27-4A99-A47D-FF0293243ADB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{F984C35B-C9FE-466B-AD88-D8EC5575E7D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F984C35B-C9FE-466B-AD88-D8EC5575E7D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F984C35B-C9FE-466B-AD88-D8EC5575E7D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75C2B418-FEDF-4F0B-A9BB-203CCA65629B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75C2B418-FEDF-4F0B-A9BB-203CCA65629B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75C2B418-FEDF-4F0B-A9BB-203CCA65629B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75C2B418-FEDF-4F0B-A9BB-203CCA65629B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B942A201-CC27-4A99-A47D-FF0293243ADB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B942A201-CC27-4A99-A47D-FF0293243ADB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B942A201-CC27-4A99-A47D-FF0293243ADB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B942A201-CC27-4A99-A47D-FF0293243ADB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
