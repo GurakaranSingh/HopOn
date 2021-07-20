@@ -14,14 +14,15 @@
 ////        });
 ////};
 function uploadfile() {
-    debugger
+     
     var files = document.getElementById("fileToUpload").files;
     var FileUploadClass = [];
     for (let i = 0; i < files.length; i++) {
         FileUploadClass[i] = new FileUpload();
         FileUploadClass[i].start_upload(files[i], Math.random());
     }
-    document.getElementById('AllDownloadButton').style.display = "inline-block";
+    //document.getElementById('AllDownloadButton').style.display = "inline-block";
+    document.getElementById('AllDownloadButton').click();
     document.getElementById('fileToUpload').value = null
 }
 function closemodel() {
@@ -30,6 +31,16 @@ function closemodel() {
             .then(data => {
             });
     };
+}
+function Resume(amazonunqID, nextslice,index) {
+     
+    var file = Selectedfile.find(obj => {
+        return obj.AmazonID === amazonunqID
+    });
+    file.IsStop = false;
+    document.getElementById("pause_" + amazonunqID).style.display = "inline-block";
+    document.getElementById("resume_" + amazonunqID).style.display = "none";
+    new FileUpload().ResumeFile(nextslice, amazonunqID, index);
 }
 function upload_file(start, amazonunqID, index) {
     var uploadClass = [];
@@ -58,7 +69,7 @@ function DownloadDeleteMultiPel(Flag) {
                 '<tr id = ' + Guid + '>' +
                 '<td style="border: 1px solid #ddd;padding: 8px;"> ' + MultiFileSelectArrayFileName[i].FileName + '</td >' +
                 '<td>' +
-                '<button type = "button" class= "btn btn-primary" onclick="RemoveItemFromList(' + Guid + ')"> Remove Item</button >' +
+                '<a href="#" onclick="RemoveItemFromList(' + Guid + ')"> <img src="Images/delete-icon.svg" style="fill:#df1b1b; width:20px; height:20px;"/></a>' +
                 '</td>' +
                 '</tr>');
         }
@@ -147,9 +158,6 @@ function CancelUploading(awsid) {
     uploadClass.CancelUploading(awsid);
 }
 
-
-
-
 function ShowIcon(guid) {
 
     var kebab = document.getElementById('k_' + guid), // document.querySelector('.kebab' + guid),
@@ -169,13 +177,13 @@ function ShowIcon(guid) {
 function downloadFromUrl(url, fileName) {
     debugger
     const anchorElement = document.createElement('a');
-    anchorElement.href = url;
-    anchorElement.download = fileName ?? '';
+    anchorElement.href = url.url;
+    anchorElement.download = url.fileName ?? '';
     anchorElement.click();
     anchorElement.remove();
 }
 function downloadFromByteArray(byteArray, fileName, contentType) {
-    debugger
+     
     // Convert base64 string to numbers array.
     const numArray = byteArray;//atob(byteArray).split('').map(c => c.charCodeAt(0));
 

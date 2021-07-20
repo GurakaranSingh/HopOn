@@ -443,6 +443,12 @@ namespace HopOn.Core.Services
                 CurrentUser.UploadQuota = CurrentUser.DownloadQuota - Quota;
             _appDBContext.SaveChanges();
         }
+        public void UpdateGenerateLinkStatus(string Guid)
+        {
+            GenratedLink Model = _appDBContext.GeneratedLinks.Where(p => p.Guid == Guid).FirstOrDefault();
+            Model.Expire = true;
+            _appDBContext.SaveChanges();
+        }
         public void SetAllETags(EtagModel prevETags)
         {
             //var partETags = new List<PartETag>();
@@ -480,6 +486,9 @@ namespace HopOn.Core.Services
                     Expires = DateTime.UtcNow.AddHours(1)
                 };
                 string urlString = _s3Client.GetPreSignedURL(request1);
+
+                //TODO:- Remove this Line For Production
+                urlString = urlString.Replace("https", "http");
                 return urlString;
             }
             catch (Exception ex)

@@ -14,6 +14,24 @@
             }
     </style>*@
 @*<label for="formFileLg" class="form-label">Large file input example</label>*@
+
+<style>
+    .close {
+        float: right;
+        font-size: 21px;
+        font-weight: 700;
+        line-height: 1;
+        color: #fff;
+        text-shadow: 0 1px 0 #fff;
+        filter: alpha(opacity=20);
+        opacity: .8;
+    }
+
+    #upldpictrModal .modal-header {
+        display:block;
+    }
+    
+</style>
 @inject IJSRuntime JSRuntime
 <div class="row">
     <div class="col-sm-11">
@@ -23,7 +41,7 @@
                 <textarea id="" name="" rows="3" cols="112" placeholder="What's New?"></textarea>
             </div>
             <div class="gallery_container">
-                <div class="thumnail_photo" style="display:none">
+                @*<div class="thumnail_photo" style="display:inline-block">
                     <div class="thumbimg">
                         <img src="images/1.jpg" alt="" class="thmb-pic">
                         <img src="images/cross_icn.svg" class="cross-icn">
@@ -34,7 +52,7 @@
                         <img src="images/cross_icn.svg" class="cross-icn">
                         <div class="overlay"></div>
                     </div>
-                </div>
+                </div>*@
                 <Progressbar />
                 <!--<div class="progressbarsec">
                     <div class="progress">-->
@@ -49,7 +67,7 @@
                     <a href="javascript:void(0)">
                         <img src="images/upload.svg" class="upload_icon" @onclick="()=>OpenUploadModel()">
                     </a>
-                    <button type="button" class="btn btn-primary">Post</button>
+                    @*<button type="button" class="btn btn-primary">Post</button>*@
                 </div>
             </div>
         </div>

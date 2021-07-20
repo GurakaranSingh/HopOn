@@ -16,7 +16,7 @@ window.refreshFileLink = () => {
 };
 
 function GetFileList(Id, _type) {
-    debugger
+     
     var xhr = new XMLHttpRequest();
     xhr.onload = function () {
         if (xhr.status == 200) {
@@ -37,7 +37,7 @@ function GetFileList(Id, _type) {
     xhr.send(JSON.stringify(obj));
 }
 function ShareFile(Guid) {
-    debugger
+     
     //var url = window.location.href + "api/Upload/ShareFile/" + Guid
     //document.getElementById("ShareLink").value = url
     var filelistcomponnent = document.getElementById('shareTextBox')
@@ -50,6 +50,6 @@ function ShareFile(Guid) {
 }
 
 function GetLink(select) {
-    debugger
+     
     GetFileList(_Guid, parseInt(select.value));
 }

@@ -13,6 +13,7 @@ namespace HopOn.Model.ViewModel
         public string FileToken { get; set; }
         public string FileLink { get; set; }
         public bool Expired { get; set; }
+        public string ValidLink { get; set; }
         public LinkType Type { get; set; }
     }
 }

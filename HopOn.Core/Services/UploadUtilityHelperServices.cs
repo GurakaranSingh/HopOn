@@ -101,9 +101,14 @@ namespace HopOn.Core.Services
         public async Task DeleteListFile(DeleteUpdateModel model)
         {
             List<UploadedFile> DeleteModel = await _appDBContext.UploadedFiles.Where(s => model.Ids.Contains(s.Guid)).ToListAsync();
+            List<GenratedLink> LinkModel = await _appDBContext.GeneratedLinks.Where(s => model.Ids.Contains(s.FileId)).ToListAsync();
             if (DeleteModel.Count > 0)
             {
                 _appDBContext.UploadedFiles.RemoveRange(DeleteModel);
+                if (LinkModel.Count > 0)
+                {
+                    _appDBContext.GeneratedLinks.RemoveRange(LinkModel);
+                }
                 await _appDBContext.SaveChangesAsync();
             }
         }

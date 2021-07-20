@@ -24,6 +24,6 @@ namespace HopOn.Core.Contract
         Task<HttpStatusCode> UploadChunks(ChunkModel request);
         GenratedLink GetGeneratedLinkFile(string id);
         Task<string> GetDownloadPreSignedUrl(string Key);
-
+        void UpdateGenerateLinkStatus(string Guid);
     }
 }

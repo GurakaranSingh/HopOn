@@ -38,7 +38,7 @@ namespace HopOn.Pages.SharedFile
                 {
                     Upfiles =  _appDBContext.GeneratedLinks.Where(g => g.FileId.Equals(Id)).Select(s => new FileShareModel()
                     {
-                        Expired = s.Expire,
+                        ValidLink = s.Expire == true ? "Expired":"Valid",
                         FileLink = s.FileLink,
                         FileToken = s.Token,
                         FileId = s.FileId.TrimStart(Convert.ToChar("'"))

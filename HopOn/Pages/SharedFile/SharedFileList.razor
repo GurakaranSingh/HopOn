@@ -1,8 +1,15 @@
 ﻿@inherits SharedFileListBaseClass
+<style>
+    }
 
+    #customers td, #customers th {
+        border: 1px solid #ddd;
+        padding: 18px 10px;
+    }
+</style>
 <p>
     Generate New Link
-    <select id="selection" @onchange="GenerateLink">
+    <select class="select" id="selection" @onchange="GenerateLink">
         <option>-Select Type-</option>
         <option>@ShareLink</option>
         <option>@GenerateToken</option>
@@ -25,7 +32,7 @@
                     <tr>
                         <td>@Link.FileLink</td>
                         <td>@Link.FileToken</td>
-                        <td>@Link.Expired</td>
+                        <td>@Link.ValidLink </td>
                         <td style="display:none"> <button class="btn btn-outline-secondary" id="GeneratedLinkListRefresh_@Link.FileId" style="display:inline-block" @onclick="() =>GeneratedLinkRefresh(Link.FileId)">static</button></td>
                     </tr>
                 }

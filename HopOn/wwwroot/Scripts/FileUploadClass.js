@@ -14,8 +14,6 @@ var time_start = new Date();
 var end_time = new Date();
 var time;
 var speedInMbps;
-var IsStopTrue = false;
-var IsNetworFail = false;
 //var next_slice = 0;
 var _amazonunqID = "";
 var Guid = "";
@@ -28,13 +26,13 @@ class FileUpload {
 
     constructor() {
     }
-    
+
 
     start_upload(files, index) {
         //files = document.getElementById("fileToUpload").files;
-        var filelistcomponnent = document.getElementById('FileListcomponent')
+        //var filelistcomponnent = document.getElementById('FileListcomponent')
+        var ImageListComponent = document.getElementById('gallery_container')
         //  for (let i = 0; i < files.length; i++) {
-
         let Guid = new FileUpload().generateUUID() + "." + files["name"].split(".")[1];
         // getting file
         //Getting AWS UniqueID
@@ -43,31 +41,40 @@ class FileUpload {
             // Process our return data
             if (xhr.status == 200) {
                 var result = JSON.parse(xhr.responseText);
-                var fileModel = { File: files, AmazonID: result.uploadId, Guid: Guid, index: index }
+                var fileModel = { File: files, AmazonID: result.uploadId, Guid: Guid, index: index, IsStop: false, IsNetworkFail: false }
                 Selectedfile.push(fileModel);
                 // time_start = new Date();
                 //displaySpeed();
                 var amazonID = "'" + result.uploadId + "'";
-                filelistcomponnent.insertAdjacentHTML("afterend",
-                    '<div class="col-md-12" id="divcomponentID_' + result.uploadId + '">' +
-                    '<h3 class= "progress-title">' + files.name + ': </h3>' +
-                    '<div class="progress">' +
-                    '<div class="progress-bar" id="progressbarid_' + result.uploadId + '" style="width:0%; background:#97c513;">' +
-                    '<div class="progress-value" id="progressbarvalue_' + result.uploadId + '">0%</div>' +
-                    '</div >' +
-                    '</div >' +
-                    '<p>' +
-                    '<button type="button" id="start_' + result.uploadId + '" class="btn btn-success" style="display:inline-block" onclick="upload_file(' + 0 + ',' + amazonID + ',' + index + ')">Start</button>' +
-                    '<button type="button" class="btn btn-warning" style="display:none" id="pause_' + result.uploadId + '" onclick="PauseUploading(' + amazonID + ')"> Pause</button>' +
-                    '<button type="button" id="resume_' + result.uploadId + '" class="btn btn-primary" style="display:none" onclick="ResumeUploading(' + amazonID + ')">Resume</button>' +
-                    '<button type="button" class="btn btn-danger" style="display:none" id="cancel_' + result.uploadId + '" onclick="CancelUploading(' + amazonID + ')">Cancel</button>' +
-                    '<button type="button" id="Remove_' + result.uploadId + '" class="btn btn-danger" style="display:none" onclick="CancelUploading(' + amazonID + ')">Remove</button>' +
-                    '<button type="button" id="Retry_' + result.uploadId + '" class="btn btn-danger" style="display:none" onclick="ReTryUploading(' + amazonID + ')">Retry</button>' +
-                    '<span style="margin-left: 136px;" id="UploadTime_' + result.uploadId + '"></span>' +
-                    '</p>' +
-                    '</div > ');
+                if (files) {
+                     
+                    if ((files.type == 'image/png') || (files.type == 'image/jpg') || (files.type == 'image/jpeg')) {
+                        var reader = new FileReader();
+                        reader.onload = function (evt) {
+                            var BodyImage = new FileUpload().GetProgressBarBody(result.uploadId, evt.target.result, amazonID, files.name,300)
+                            ImageListComponent.insertAdjacentHTML("afterend",
+                                BodyImage
+
+                            );
+                            //filelistcomponnent.insertAdjacentHTML("afterend",
+                            //    );
+                            //document.getElementById("image-container").innerHTML = imgTag;
+                        };
+                        reader.onerror = function (evt) {
+                            console.error("An error ocurred reading the file", evt);
+                        };
+                        reader.readAsDataURL(files);
+
+                    } else {
+                        var BodyImage = new FileUpload().GetProgressBarBody(result.uploadId, "Images/mp4.png", amazonID, files.name, 160)
+                        ImageListComponent.insertAdjacentHTML("afterend",
+                            BodyImage
+
+                        );
+                    };
+                }
             }
-        };
+        }
         var obj = {
             fileSize: files.size,
             fileName: files.name.toString(),
@@ -77,6 +84,37 @@ class FileUpload {
         xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
         xhr.send(JSON.stringify(obj));
         //}
+    }
+
+    GetProgressBarBody(uploadId, trgResult, amazonID, Filename, width) {
+        var ProgressbarBody =
+            '<div class="col-md-12" id="divcomponentID_' + uploadId + '">' +
+            '<div class="thumbimg">' +
+            '<img style="max-width:'+width+'px;" src="' + trgResult + '" alt="my image" />' +
+            '<img src="images/cross_icn.svg" id="cancel_' + uploadId + '" onclick="CancelUploading(' + amazonID + ')" class="cross-icn">' +
+            //'<div class="overlay">' +
+            //'</div> ' +
+            '</div>' +
+            '<div class="col-md-12" id="' + uploadId + '">' +
+            '<h3 class= "progress-title">' + Filename + '</h3>' +
+            '<div class="progress">' +
+            '<div class="progress-bar" id="progressbarid_' + uploadId + '" style="width:0%; background:#337ab7;">' +
+            '<div class="progress-value" style="display:none" id="progressbarvalue_' + uploadId + '">0%' +
+            '</div> ' +
+            '</div>' +
+            '</div>' +
+            '<p class="progressBlock">' +
+            // '<a href="#" id="start_' + result.uploadId + '"  style="display:inline-block" onclick="upload_file(' + 0 + ',' + amazonID + ',' + index + ')"><img src="Images/play-icon.svg" /></a>' +
+            '<a href="#" style="display:inline-block" id="pause_' + uploadId + '" onclick="PauseUploading(' + amazonID + ')"> <img src="Images/pause-icon.svg" /></a>' +
+            '<a href="#" id="resume_' + uploadId + '" style="display:none" onclick="Resume();">  <img src="Images/resume-icon.svg" /></a>' +
+            '<a href="#" id="Retry_' + uploadId + '"  style="display:none" onclick="ReTryUploading(' + amazonID + ')"><img src="Images/retry-icon.svg" /></a>' +
+            //'<button type="button" class="btn btn-danger" style="display:none" id="cancel_' + result.uploadId + '" onclick="CancelUploading(' + amazonID + ')">Cancel</button>' +
+            //'<button type="button" id="Remove_' + result.uploadId + '" class="btn btn-danger" style="display:none" onclick="CancelUploading(' + amazonID + ')">Remove</button>' +
+            '<span style="margin-left: 136px;" id="UploadTime_' + uploadId + '"></span>' +
+            '</p>' +
+            '</div>'
+        '</div>';
+        return ProgressbarBody;
     }
     generateUUID() { // Public Domain/MIT
         var d = new Date().getTime();//Timestamp
@@ -93,7 +131,7 @@ class FileUpload {
             return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
         });
     }
-  
+
     UploadInOneCall(file, amazonunqID, Guid, index) {
         var reader = {};
         reader = new FileReader();
@@ -126,7 +164,7 @@ class FileUpload {
             xhr.open("POST", "api/Upload/UploadInOneCall", true);
             xhr.setRequestHeader("Content-Type", "application/json; charset=utf8");
             xhr.send(JSON.stringify(obj));
-
+             
             var Progressbaraid = 'progressbarid_' + amazonunqID;
             var Progressvalueid = 'progressbarvalue_' + amazonunqID;
             document.getElementById(Progressbaraid).style.width = 100 + '%';
@@ -140,9 +178,8 @@ class FileUpload {
     upload_file(start, amazonunqID, index) {
         var reader = {};
         reader = new FileReader();
-        new FileUpload().SHowHideButtonsOnStart(amazonunqID);
+      //  new FileUpload().SHowHideButtonsOnStart(amazonunqID);
         let blob = "";
-
         _amazonunqID = amazonunqID;
         var file = Selectedfile.find(obj => {
             return obj.AmazonID === amazonunqID
@@ -166,7 +203,6 @@ class FileUpload {
             next_slice = file.File.size;
             blob = file.File.slice(start);
         }
-
         reader.onload = function (event) {
             if (event.target.readyState !== FileReader.DONE) {
                 return;
@@ -174,18 +210,18 @@ class FileUpload {
             //Saving chunk file
             if (time_start == null) { time_start = new Date(); }
             var xhr = new XMLHttpRequest();
-            if (!IsStopTrue && !IsNetworFail) {
+            if (!file.IsStop && !file.IsNetworkFail) {
+                var aws = "'" + amazonunqID + "'"
+                document.getElementById("resume_" + amazonunqID).setAttribute("onclick", "Resume(" + aws + "," + next_slice + "," + index + ")");
                 xhr.onload = function () {
                     if (xhr.status == 200) {
-                         
+
                         if (xhr.response == "507") {
-                            debugger
-                           
-                            IsStopTrue = true
-                            new FileUpload().SHowHideButtonsOnStart(amazonunqID);
+                            file.IsStop = true
+                          //  new FileUpload().SHowHideButtonsOnStart(amazonunqID);
                             document.getElementById("pause_" + amazonunqID).style.display = "none";
-                            document.getElementById("cancel_" + amazonunqID).style.display = "none";
-                            document.getElementById("Remove_" + amazonunqID).style.display = "inline-block";
+                           // document.getElementById("cancel_" + amazonunqID).style.display = "none";
+                            //document.getElementById("Remove_" + amazonunqID).style.display = "inline-block";
                             document.getElementById('progressbarid_' + amazonunqID).innerHTML = 'Insufficient Storage';
                             document.getElementById('progressbarid_' + amazonunqID).style.width = 100 + '%';
                             if (next_slice < file.File.size) {
@@ -202,7 +238,7 @@ class FileUpload {
                         end_time = new Date();
                         var size_done = start + slice_size;
                         var percent_done = Math.floor((size_done / file.File.size) * 100);
-                         
+
                         if (document.getElementById('progressbarvalue_' + amazonunqID) != null) {
                             if (document.getElementById('progressbarid_' + amazonunqID).innerHTML != "Insufficient Storage") {
                                 var Progressbaraid = 'progressbarid_' + amazonunqID;
@@ -210,7 +246,7 @@ class FileUpload {
                                 console.log("ProgresbaarID = " + Progressbaraid + " Percentage = " + percent_done);
                                 if (percent_done > 100) { percent_done = 100; }
                                 //var UploadTime = 'UploadTime_' + file.File.name
-                                if (!IsStopTrue) {
+                                if (!file.IsStop) {
                                     document.getElementById(Progressbaraid).style.width = percent_done + '%';
                                     document.getElementById(Progressvalueid).innerHTML = percent_done + '%';
                                 }
@@ -227,7 +263,7 @@ class FileUpload {
                             new FileUpload().upload_file(next_slice, amazonunqID, index);
                         }
                         else {
-                             
+
                             // Update upload progress
                             //FInal Method call
                             document.getElementById(Progressvalueid).innerHTML = 'Server is merging chunk please wait!.';
@@ -383,11 +419,11 @@ class FileUpload {
         xhr.send(JSON.stringify(obj));
     }
 
-    SHowHideButtonsOnStart(amazonunqID ) {
-        document.getElementById("start_" + amazonunqID).style.display = "none";
-        document.getElementById("cancel_" + amazonunqID).style.display = "inline-block";
-        if (!IsStopTrue)
-            document.getElementById("pause_" + amazonunqID).style.display = "inline-block";
+    SHowHideButtonsOnStart(amazonunqID) {
+        //document.getElementById("start_" + amazonunqID).style.display = "none";
+        //document.getElementById("cancel_" + amazonunqID).style.display = "inline-block";
+        //if (!IsStopTrue)
+           // document.getElementById("pause_" + amazonunqID).style.display = "inline-block";
     }
 
     //function displaySpeed(time_start, end_time, LoadedBytes) {
@@ -415,13 +451,21 @@ class FileUpload {
         }, 1000);
     }
     PauseUploading(amazonunqID) {
+         
         //console.log("PauseCall");
-        IsStopTrue = true;
+        var file = Selectedfile.find(obj => {
+            return obj.AmazonID === amazonunqID
+        });
+        file.IsStop = true;
         document.getElementById("pause_" + amazonunqID).style.display = "none";
         document.getElementById("resume_" + amazonunqID).style.display = "inline-block";
+        //document.getElementById("resume_" + amazonunqID).setAttribute("onclick", "ResumeUploading('" + amazonunqID + "','" + next_slice + "')'");
     }
     NetworkIssue(amazonunqID, FileName) {
-        IsNetworFail = true;
+        var file = Selectedfile.find(obj => {
+            return obj.AmazonID === amazonunqID
+        });
+        file.IsNetworkFail = true;
         document.getElementById("Retry_" + amazonunqID).style.display = "inline-block";
         document.getElementById("UploadTime_" + FileName).style.display = "none";
         document.getElementById("RetryMessage_" + amazonunqID).innerHTML = "Your Internet Network Fail! Please Try Again";
@@ -430,16 +474,23 @@ class FileUpload {
         document.getElementById("pause_" + amazonunqID).style.display = "none";
         document.getElementById("resume_" + amazonunqID).style.display = "none";
     }
-    ResumeUploading(amazonunqID) {
-
-        IsStopTrue = false
-        document.getElementById("pause_" + amazonunqID).style.display = "inline-block";
-        document.getElementById("resume_" + amazonunqID).style.display = "none";
-        upload_file(next_slice, _amazonunqID);
+    //ResumeUploading(next_slice,amazonunqID, index) {
+    //    var file = Selectedfile.find(obj => {
+    //        return obj.AmazonID === amazonunqID
+    //    });
+    //    file.IsStop = true;
+    //    document.getElementById("pause_" + amazonunqID).style.display = "inline-block";
+    //    document.getElementById("resume_" + amazonunqID).style.display = "none";
+    //    upload_file(next_slice, _amazonunqID,index);
+    //}
+    ResumeFile(next_slice, _amazonunqID, _index) {
+        upload_file(next_slice, _amazonunqID, _index);
     }
-
     ReTryUploading(amazonunqID) {
-        IsNetworFail = false
+        var file = Selectedfile.find(obj => {
+            return obj.AmazonID === amazonunqID
+        });
+        file.IsNetworkFail = true;
         document.getElementById("pause_" + amazonunqID).style.display = "inline-block";
         document.getElementById("resume_" + amazonunqID).style.display = "none";
         document.getElementById("Retry_" + amazonunqID).style.display = "none";

@@ -79,9 +79,10 @@ namespace HopOn.Pages.Download
         }
         public async Task ValidateToken()
         {
-            if (Token == Model.Token)
+            if (Token == Model.Token && !Model.Expire)
             {
                 var response = await _fileHandler.Download(Model.FileId);
+                _fileHandler.UpdateGenerateLinkStatus(Model.Guid);
                 await DownloadFile(Model.FileId, response.FileDownloadName);
             }
             else

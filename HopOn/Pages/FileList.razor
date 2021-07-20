@@ -13,7 +13,7 @@
         }
 
         #customers tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: #f9f9f9;
         }
 
         #customers tr:hover {
@@ -24,8 +24,8 @@
             padding-top: 12px;
             padding-bottom: 12px;
             text-align: left;
-            background-color: #04AA6D;
-            color: white;
+            background-color: #bfbfbf;
+            color: #444;
         }
 
     .card-deck.custom_card {
@@ -68,7 +68,7 @@
             width: 4px;
             height: 4px;
             border-radius: 5px;
-            background: #00bcd4;
+            background: #337ab7;
             margin: 3px 4px;
         }
 
@@ -170,6 +170,93 @@
         height: 200px;
         object-fit: cover;
     }
+
+    .card-deck.custom_card .dropdown li a img {
+        width: 25px;
+        height: 25px;
+    }
+
+
+    #DeleteConfirmModal .modal-header {
+        padding: 10px 12px;
+        border-bottom: 1px solid #e5e5e5;
+        background-color: #5181b8;
+        color: #fff;
+    }
+
+        #DeleteConfirmModal .modal-header h4 {
+            font-size: 16px;
+        }
+
+    #DeleteConfirmModal .close {
+        color: #fff;
+        text-shadow: 0 1px 0 #fff;
+        filter: alpha(opacity=80);
+        opacity: .8;
+    }
+
+    #DeleteConfirmModal .modal-header .close {
+        margin-top: -8px;
+    }
+
+    #ShareFileLink .modal-header h4 {
+        font-size: 18px;
+        color: #fff;
+    }
+
+    select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        -ms-appearance: none;
+        appearance: none;
+        outline: 0;
+        box-shadow: none;
+        border: 0 !important;
+        background: #2c3e50;
+        background-image: none;
+    }
+        /* Remove IE arrow */
+        select::-ms-expand {
+            display: none;
+        }
+    /* Custom Select */
+    .select {
+        position: relative;
+        display: flex;
+        width: 20em;
+        height: 3em;
+        line-height: 3;
+        background: #2c3e50;
+        overflow: hidden;
+        border-radius: .25em;
+    }
+
+    select {
+        flex: 1;
+        padding: 0 .5em;
+        color: #fff;
+        cursor: pointer;
+    }
+    /* Arrow */
+    .select::after {
+        content: '\25BC';
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 0 1em;
+        background: #34495e;
+        cursor: pointer;
+        pointer-events: none;
+        -webkit-transition: .25s all ease;
+        -o-transition: .25s all ease;
+        transition: .25s all ease;
+    }
+    /* Transition */
+    .select:hover::after {
+        color: #f39c12;
+    }
+
+    
 </style>
 
 <h3>File List</h3>
@@ -197,13 +284,13 @@
                         <p class="cross" id="c_@File.Guid">x</p>
                         <figure></figure>
                         <ul class="dropdown" id="d_@File.Guid">
-                            <li><a href="javascript:void(0)" class="" @onclick="()=>ShowLinkModelMethod(File.Guid)">Share File</a></li>
-                            <li><a href="api/Upload/Download/@File.Guid" id="@File.Guid" class="">Download</a></li>
-                            <li><a href="javascript:void(0)" class="" onclick="DeleteFile('@File.Guid')">Delete</a></li>
+                            <li><a href="javascript:void(0)" class="" @onclick="()=>ShowLinkModelMethod(File.Guid)"><img src="Images/share-icon.svg" /></a></li>
+                            <li><a href="api/Upload/Download/@File.Guid" id="@File.Guid" class=""><img src="Images/download-icon.svg"/></a></li>
+                            <li><a href="javascript:void(0)" class="" onclick="DeleteFile('@File.Guid')"><img src="Images/delete-icon.svg"/></a></li>
                         </ul>
                     </div>
                 </ul>
-
+                
                 <div class="img-card">
                     <img class="card-img-top imageThumbnail" src="@File.FilePath" />
                 </div>
