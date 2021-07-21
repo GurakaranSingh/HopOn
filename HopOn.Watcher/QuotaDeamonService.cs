@@ -59,13 +59,15 @@ namespace HopOn.Watcher
             try
             {
                 DateTime LastUpdateDate = DateTime.Now.AddDays(-1);
+                DateTime TodayDate = DateTime.Now;
                 using (MySqlConnection conn = new MySqlConnection(_connectionString))
                 {
                     conn.Open();
-                    string query = "UPDATE users set DownloadQuota = MaxDownload , UploadQuota= MaxUpload where LastUpdate = @CurrentDate";
+                    string query = "UPDATE users set DownloadQuota = MaxDownload , UploadQuota= MaxUpload,LastUpdate = @Today  where LastUpdate = @CurrentDate";
                     using (var command = new MySqlCommand(query, conn))
                     {
                         command.Parameters.AddWithValue("@CurrentDate", LastUpdateDate);
+                        command.Parameters.AddWithValue("@Today", TodayDate);
                         command.ExecuteNonQuery();
                     }
                 }
