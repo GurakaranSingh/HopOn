@@ -12,6 +12,10 @@ namespace HopOn.Model.Model
         public string Name { get; set; }
         public int DownloadQuota { get; set; }
         public int UploadQuota { get; set; }
+        public int MaxDownload { get; set; }
+        public int MaxUpload { get; set; }
+        public int StorageQuota { get; set; }
+        public DateTime LastUpdate { get; set; }
     }
     public enum QuotaType
     {

@@ -34,6 +34,7 @@ namespace HopOn.Watcher
                services.Configure<IFileHandler>(hostContext.Configuration.GetSection("FileHandler"));
 
                services.AddSingleton<IHostedService, DaemonService>();
+               services.AddSingleton<IHostedService, QuotaDeamonService>();
            });
              builder.RunConsoleAsync();
             //CreateHostBuilder(args).Build().Run();
