@@ -23,6 +23,8 @@ namespace HopOn.Model.ViewModel
         public string UploadQuota { get; set; }
         public decimal Download_Quota { get; set; }
         public string DownloadQuota { get; set; }
-        public String  StorageQuota { get; set; }
+        public decimal StorageQuotaPercentage { get; set; }
+        public string StorageQuota { get; set; }
+        public decimal MaxStorageQuota { get; set; }
     }
 }

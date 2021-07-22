@@ -504,6 +504,7 @@ class FileUpload {
         var xhr = new XMLHttpRequest();
         xhr.onload = function () {
             if (xhr.status == 200) {
+                document.getElementById("RefreshQuota").click();
                 document.getElementById("FileListRefresh").click();
             };
         }

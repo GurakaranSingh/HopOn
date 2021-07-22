@@ -14,7 +14,6 @@
 ////        });
 ////};
 function uploadfile() {
-     
     var files = document.getElementById("fileToUpload").files;
     var FileUploadClass = [];
     for (let i = 0; i < files.length; i++) {
@@ -79,6 +78,7 @@ function DownloadDeleteMultiPel(Flag) {
         document.getElementById('DeleteConfirmModal').style.display = "none";
         uploadClass.DownloadDeleteMultiPel(Flag);
     }
+    document.getElementById("RefreshQuota").click();
 }
 
 function RemoveItemFromList(Guid) {
@@ -104,6 +104,7 @@ function ConfirmDelete() {
 
     }
     document.getElementById('DeleteConfirmModal').style.display = "none";
+    document.getElementById("RefreshQuota").click();
     location.reload();
 }
 function closeModel(flag) {
@@ -177,6 +178,7 @@ function ShowIcon(guid) {
 
 function downloadFromUrl(url, fileName) {
     debugger
+    document.getElementById("RefreshQuota").click();
     const anchorElement = document.createElement('a');
     anchorElement.href = url.url;
     anchorElement.download = url.fileName ?? '';

@@ -20,6 +20,7 @@ namespace HopOn.Core.Services
         private readonly AppDBContext _appDBContext;
         public IConfiguration _configuration { get; }
         public string _connectionString { get; set; }
+        private User CurrentUser;
         #endregion
 
         #region Constructor  
@@ -28,6 +29,7 @@ namespace HopOn.Core.Services
             this._appDBContext = appDBContext;
             this._configuration = Configuration;
             _connectionString = _configuration.GetConnectionString("DefaultConnection");
+            CurrentUser = _appDBContext.Users.Find(1);
         }
 
         #endregion
@@ -76,6 +78,7 @@ namespace HopOn.Core.Services
                 List<GenratedLink> RemoveLinksList = await _appDBContext.GeneratedLinks.Where(gl => gl.FileId == Guid).ToListAsync();
                 if (RemoveModel != null)
                 {
+                    AlterQuota(RemoveModel.FileSize);
                     _appDBContext.UploadedFiles.Remove(RemoveModel);
                     await _appDBContext.SaveChangesAsync();
 
@@ -97,7 +100,11 @@ namespace HopOn.Core.Services
             }
         }
         #endregion
-
+        public void AlterQuota(int Quota)
+        {
+                CurrentUser.StorageQuota = CurrentUser.StorageQuota + Quota;
+            _appDBContext.SaveChanges();
+        }
         public async Task DeleteListFile(DeleteUpdateModel model)
         {
             List<UploadedFile> DeleteModel = await _appDBContext.UploadedFiles.Where(s => model.Ids.Contains(s.Guid)).ToListAsync();
@@ -154,14 +161,17 @@ namespace HopOn.Core.Services
         public ShowQuotaViewModel GetQuota()
         {
             User UserModel = _appDBContext.Users.Where(u => u.Id == 1).FirstOrDefault();
+            _appDBContext.Entry(UserModel).Reload();
             ShowQuotaViewModel model = new ShowQuotaViewModel();
             model.Download_Quota = UserModel.MaxDownload;
             model.Remaining_Download_Quota = UserModel.DownloadQuota;
             model.Upload_Quota = UserModel.MaxUpload;
+            model.MaxStorageQuota = UserModel.MaxStorageQuota;
             model.Remaining_Upload_Quota = UserModel.UploadQuota;
             model.Storage_Quota = ((UserModel.StorageQuota / 1024) / 1024);
             model.RemainiuploadPercentage = Convert.ToDecimal((float)System.Math.Round(model.Remaining_Upload_Quota / model.Upload_Quota * 100, 2));
             model.RemainingDownloadPercentage = Convert.ToDecimal((float)System.Math.Round(model.Remaining_Download_Quota / model.Download_Quota * 100, 2));
+            model.StorageQuotaPercentage = Convert.ToDecimal((float)System.Math.Round(UserModel.StorageQuota / model.MaxStorageQuota * 100, 2));
             model.RDQ = ((model.Remaining_Download_Quota / 1024) / 1024);
             model.RUQ = ((model.Remaining_Upload_Quota / 1024) / 1024);
             model.RemainingDownloadQuota = model.RDQ < 1024 ? Convert.ToDecimal((float)System.Math.Round(model.RDQ, 2)) + "MB" : Convert.ToString((float)System.Math.Round(model.RDQ / 1024, 0)) + "GB";
@@ -182,8 +192,8 @@ namespace HopOn.Core.Services
                 {
                     conn.Open();
 
-                    
-                    string query = "update users set UploadQuota = (UploadQuota - @UploadQuota) where Id = @ID";
+
+                    string query = "update users set UploadQuota = (UploadQuota - @UploadQuota), StorageQuota =(StorageQuota -@UploadQuota ) where Id = @ID";
 
                     using (var command = new MySqlCommand(query, conn))
                     {

@@ -440,7 +440,10 @@ namespace HopOn.Core.Services
             if (Type == QuotaType.Download)
                 CurrentUser.DownloadQuota = CurrentUser.DownloadQuota - Quota;
             else if (Type == QuotaType.Upload)
-                CurrentUser.UploadQuota = CurrentUser.DownloadQuota - Quota;
+            {
+                CurrentUser.UploadQuota = CurrentUser.UploadQuota - Quota;
+                CurrentUser.StorageQuota = CurrentUser.StorageQuota- Quota;
+            }
             _appDBContext.SaveChanges();
         }
         public void UpdateGenerateLinkStatus(string Guid)

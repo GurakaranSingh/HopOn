@@ -285,7 +285,8 @@
                         <figure></figure>
                         <ul class="dropdown" id="d_@File.Guid">
                             <li><a href="javascript:void(0)" class="" @onclick="()=>ShowLinkModelMethod(File.Guid)"><img src="Images/share-icon.svg" /></a></li>
-                            <li><a href="api/Upload/Download/@File.Guid" id="@File.Guid" class=""><img src="Images/download-icon.svg"/></a></li>
+                            <li><a href="#" id="@File.Guid" class="" @onclick="()=>DownloadWithPreSignedUrl(File.Guid)"><img src="Images/download-icon.svg"/></a></li>
+                            <li>@*<a href="api/Upload/Download/@File.Guid" id="@File.Guid" class=""><img src="Images/download-icon.svg"/></a>*@</li>
                             <li><a href="javascript:void(0)" class="" onclick="DeleteFile('@File.Guid')"><img src="Images/delete-icon.svg"/></a></li>
                         </ul>
                     </div>

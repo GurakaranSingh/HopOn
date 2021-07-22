@@ -90,7 +90,6 @@
             </div>
         </div>
     </div>
-
     <div class="progress-viewquota">
         <div class="width-100">
             <div class="custd-flex">
@@ -99,7 +98,7 @@
                     <div class="width-100"> @model.StorageQuota</div>
                     <div class="width-100">
                         <div class="progress custom-quta" style="width:60%; height:6px;">
-                            <div class="progress-bar custom-qutabg" role="progressbar" style="width:100%; " aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">&nbsp;</div>
+                            <div class="progress-bar custom-qutabg" role="progressbar" style="width:@model.StorageQuotaPercentage%; " aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">&nbsp;</div>
                         </div>
                     </div>
                 </div>

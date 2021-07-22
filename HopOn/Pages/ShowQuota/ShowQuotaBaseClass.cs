@@ -26,12 +26,12 @@ namespace HopOn.Pages.ShowQuota
         }
         protected override Task OnInitializedAsync()
         {
-            UpdateQUota();
+             UpdateQUota();
             return base.OnInitializedAsync();
         }
-        public async Task RefreshQuota()
+        public void RefreshQuota()
         {
-            UpdateQUota();
+             UpdateQUota();
         }
     }
 }

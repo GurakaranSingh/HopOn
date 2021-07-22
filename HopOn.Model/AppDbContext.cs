@@ -10,6 +10,9 @@ namespace HopOn.Model
 {
     public class AppDBContext : DbContext
     {
+        public AppDBContext():base()
+        {
+        }
         public AppDBContext(DbContextOptions<AppDBContext> options)
             : base(options)
         { }
