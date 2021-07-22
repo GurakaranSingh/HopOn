@@ -31,7 +31,7 @@ class FileUpload {
     start_upload(files, index) {
         //files = document.getElementById("fileToUpload").files;
         //var filelistcomponnent = document.getElementById('FileListcomponent')
-        var ImageListComponent = document.getElementById('gallery_container')
+        var ImageListComponent = document.getElementById('ListComponent')
         //  for (let i = 0; i < files.length; i++) {
         let Guid = new FileUpload().generateUUID() + "." + files["name"].split(".")[1];
         // getting file
@@ -51,7 +51,7 @@ class FileUpload {
                     if ((files.type == 'image/png') || (files.type == 'image/jpg') || (files.type == 'image/jpeg')) {
                         var reader = new FileReader();
                         reader.onload = function (evt) {
-                            var BodyImage = new FileUpload().GetProgressBarBody(result.uploadId, evt.target.result, amazonID, files.name,300)
+                            var BodyImage = new FileUpload().GetProgressBarBody(result.uploadId, evt.target.result, amazonID, files.name)
                             ImageListComponent.insertAdjacentHTML("afterend",
                                 BodyImage
 
@@ -66,7 +66,7 @@ class FileUpload {
                         reader.readAsDataURL(files);
 
                     } else {
-                        var BodyImage = new FileUpload().GetProgressBarBody(result.uploadId, "Images/mp4.png", amazonID, files.name, 160)
+                        var BodyImage = new FileUpload().GetProgressBarBody(result.uploadId, "Images/mp4.png", amazonID, files.name)
                         ImageListComponent.insertAdjacentHTML("afterend",
                             BodyImage
 
@@ -86,16 +86,16 @@ class FileUpload {
         //}
     }
 
-    GetProgressBarBody(uploadId, trgResult, amazonID, Filename, width) {
+    GetProgressBarBody(uploadId, trgResult, amazonID, Filename) {
         var ProgressbarBody =
-            '<div class="col-md-12" id="divcomponentID_' + uploadId + '">' +
-            '<div class="thumbimg">' +
-            '<img style="max-width:'+width+'px;" src="' + trgResult + '" alt="my image" />' +
-            '<img src="images/cross_icn.svg" id="cancel_' + uploadId + '" onclick="CancelUploading(' + amazonID + ')" class="cross-icn">' +
+            '<div class="thumbimg" id="divcomponentID_' + uploadId + '">' +
+            '<div class="thumbimg-thmb">' +
+            '<img class="thmb-pic" src="' + trgResult + '" alt="my image" />' +
+            '<img class="cross-icn" src="images/cross_icn.svg" id="cancel_' + uploadId + '" onclick="CancelUploading(' + amazonID + ')" class="cross-icn">' +
             //'<div class="overlay">' +
             //'</div> ' +
-            '</div>' +
-            '<div class="col-md-12" id="' + uploadId + '">' +
+            
+            '<div class="width-100" id="' + uploadId + '">' +
             '<h3 class= "progress-title">' + Filename + '</h3>' +
             '<div class="progress">' +
             '<div class="progress-bar" id="progressbarid_' + uploadId + '" style="width:0%; background:#337ab7;">' +
@@ -112,8 +112,9 @@ class FileUpload {
             //'<button type="button" id="Remove_' + result.uploadId + '" class="btn btn-danger" style="display:none" onclick="CancelUploading(' + amazonID + ')">Remove</button>' +
             '<span style="margin-left: 136px;" id="UploadTime_' + uploadId + '"></span>' +
             '</p>' +
+            '</div>' +
             '</div>'
-        '</div>';
+        '</div>'
         return ProgressbarBody;
     }
     generateUUID() { // Public Domain/MIT
@@ -213,6 +214,7 @@ class FileUpload {
             if (!file.IsStop && !file.IsNetworkFail) {
                 var aws = "'" + amazonunqID + "'"
                 document.getElementById("resume_" + amazonunqID).setAttribute("onclick", "Resume(" + aws + "," + next_slice + "," + index + ")");
+                document.getElementById("RefreshQuota").click();
                 xhr.onload = function () {
                     if (xhr.status == 200) {
 
@@ -263,7 +265,6 @@ class FileUpload {
                             new FileUpload().upload_file(next_slice, amazonunqID, index);
                         }
                         else {
-
                             // Update upload progress
                             //FInal Method call
                             document.getElementById(Progressvalueid).innerHTML = 'Server is merging chunk please wait!.';
@@ -281,6 +282,7 @@ class FileUpload {
                 };
 
                 var ChucknData = event.target.result.toString();
+                //TODO : replace with highway hash
                 var TestKey = "jsdkjsadkjaskjdkjsahdkjasdjkhsajkdsakjlhdkjsahdjsadij";
                 var CLienHashKey = new SHA256Hash().SHA256(TestKey);
                 var awsuniqueID = amazonunqID;

@@ -20,5 +20,6 @@ namespace HopOn.Core.Contract
         Task DeleteEtagModel(string AwsID);
         Task DeleteListFile(DeleteUpdateModel model);
         Task UpdateUploadQuota(User CurrentUser, int updatequota);
+        ShowQuotaViewModel GetQuota();
     }
 }

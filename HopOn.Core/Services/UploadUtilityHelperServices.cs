@@ -151,6 +151,28 @@ namespace HopOn.Core.Services
                 throw;
             }
         }
+        public ShowQuotaViewModel GetQuota()
+        {
+            User UserModel = _appDBContext.Users.Where(u => u.Id == 1).FirstOrDefault();
+            ShowQuotaViewModel model = new ShowQuotaViewModel();
+            model.Download_Quota = UserModel.MaxDownload;
+            model.Remaining_Download_Quota = UserModel.DownloadQuota;
+            model.Upload_Quota = UserModel.MaxUpload;
+            model.Remaining_Upload_Quota = UserModel.UploadQuota;
+            model.Storage_Quota = ((UserModel.StorageQuota / 1024) / 1024);
+            model.RemainiuploadPercentage = Convert.ToDecimal((float)System.Math.Round(model.Remaining_Upload_Quota / model.Upload_Quota * 100, 2));
+            model.RemainingDownloadPercentage = Convert.ToDecimal((float)System.Math.Round(model.Remaining_Download_Quota / model.Download_Quota * 100, 2));
+            model.RDQ = ((model.Remaining_Download_Quota / 1024) / 1024);
+            model.RUQ = ((model.Remaining_Upload_Quota / 1024) / 1024);
+            model.RemainingDownloadQuota = model.RDQ < 1024 ? Convert.ToDecimal((float)System.Math.Round(model.RDQ, 2)) + "MB" : Convert.ToString((float)System.Math.Round(model.RDQ / 1024, 0)) + "GB";
+            model.RemainingUploadQuota = model.RUQ < 1024 ? Convert.ToString((float)System.Math.Round(model.RUQ, 2)) + "MB" : Convert.ToString((float)System.Math.Round(model.RUQ / 1024, 0)) + "GB";
+            model.Upload_Quota = ((model.Upload_Quota / 1024) / 1024);
+            model.Download_Quota = ((model.Download_Quota / 1024) / 1024);
+            model.UploadQuota = model.Upload_Quota < 1024 ? Convert.ToString((float)System.Math.Round(model.Upload_Quota)) + "MB" : Convert.ToString((float)System.Math.Round(model.Upload_Quota / 1024, 0)) + "GB";
+            model.DownloadQuota = model.Download_Quota < 1024 ? Convert.ToString((float)System.Math.Round(model.Download_Quota)) + "MB" : Convert.ToString((float)System.Math.Round(model.Download_Quota / 1024, 0)) + "GB";
+            model.StorageQuota = model.Storage_Quota < 1024 ? Convert.ToString((float)System.Math.Round(model.Storage_Quota)) + "MB" : Convert.ToString((float)System.Math.Round(model.Storage_Quota / 1024, 0)) + "GB";
+            return model;
+        }
         public async Task UpdateUploadQuota(User CurrentUser, int updatequota)
         {
             try

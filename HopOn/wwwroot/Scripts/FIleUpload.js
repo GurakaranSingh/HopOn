@@ -104,6 +104,7 @@ function ConfirmDelete() {
 
     }
     document.getElementById('DeleteConfirmModal').style.display = "none";
+    location.reload();
 }
 function closeModel(flag) {
     switch (flag) {
